@@ -1,7 +1,4 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
+
 package gestionparcelas;
 
 /**
@@ -62,4 +59,13 @@ public class Maquina {
         System.out.println("Modelo: " + modelo);
         System.out.println("Estado: " + estado);
     }
+    
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        Maquina maquina = (Maquina) obj;
+        return modelo.equals(maquina.modelo);
+    }
+
 }
