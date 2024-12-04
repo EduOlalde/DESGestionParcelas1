@@ -11,7 +11,7 @@ public class Agricultor {
     private String nombre;
     private String password;
 
-    public Agricultor(String id, String nombre, String password, String especialidad) {
+    public Agricultor(String id, String nombre, String password) {
         this.id = id;
         this.nombre = nombre;
         this.password = password;

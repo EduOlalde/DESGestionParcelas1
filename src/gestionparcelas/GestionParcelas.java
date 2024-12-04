@@ -14,6 +14,53 @@ public class GestionParcelas {
     private static Lista<Maquina> maquinas = new Lista<>();
     private static Lista<Parcela> parcelas = new Lista<>();
     private static Scanner scanner = new Scanner(System.in);
+    
+    public static void main(String[] args) {
+        // Cargar datos al inicio
+        cargarAgricultoresDesdeArchivo();
+        cargarMaquinasDesdeArchivo();
+        cargarParcelasDesdeArchivo();
+
+        // Menú principal
+        boolean salir = false;
+        while (!salir) {
+            mostrarMenu();
+            int opcion = leerEntero("Selecciona una opción: ");
+
+            switch (opcion) {
+                case 1:
+                    gestionarAgricultores();
+                    break;
+                case 2:
+                    gestionarMaquinas();
+                    break;
+                case 3:
+                    gestionarParcelas();
+                    break;
+                case 4:
+                    listarDatos();
+                    break;
+                case 5:
+                    salir = true;
+                    System.out.println("¡Hasta luego!");
+                    break;
+                default:
+                    System.out.println("Opción no válida.");
+            }
+        }
+    }
+    
+    private static int leerEntero(String mensaje) {
+    while (true) {
+        try {
+            System.out.print(mensaje);
+            return Integer.parseInt(scanner.nextLine());
+        } catch (NumberFormatException e) {
+            System.out.println("Por favor, ingrese un número válido.");
+        }
+    }
+}
+
 
     private static void guardarAgricultoresEnArchivo() {
         try (PrintWriter writer = new PrintWriter(new FileWriter("agricultores.txt"))) {
@@ -35,7 +82,7 @@ public class GestionParcelas {
             while ((linea = reader.readLine()) != null) {
                 String[] datos = linea.split(",");
                 if (datos.length == 3) {
-                    Agricultor agricultor = new Agricultor(datos[0], datos[1], datos[2], ""); // El último parámetro es opcional
+                    Agricultor agricultor = new Agricultor(datos[0], datos[1], datos[2]);
                     agricultores.add(agricultor);
                 }
             }
@@ -118,42 +165,6 @@ public class GestionParcelas {
         }
     }
 
-    public static void main(String[] args) {
-        // Cargar datos al inicio
-        cargarAgricultoresDesdeArchivo();
-        cargarMaquinasDesdeArchivo();
-        cargarParcelasDesdeArchivo();
-
-        // Menú principal
-        boolean salir = false;
-        while (!salir) {
-            mostrarMenu();
-            int opcion = scanner.nextInt();
-            scanner.nextLine();  // Limpiar el buffer
-
-            switch (opcion) {
-                case 1:
-                    gestionarAgricultores();
-                    break;
-                case 2:
-                    gestionarMaquinas();
-                    break;
-                case 3:
-                    gestionarParcelas();
-                    break;
-                case 4:
-                    listarDatos();
-                    break;
-                case 5:
-                    salir = true;
-                    System.out.println("¡Hasta luego!");
-                    break;
-                default:
-                    System.out.println("Opción no válida.");
-            }
-        }
-    }
-
     private static void mostrarMenu() {
         System.out.println("\n--- MENÚ PRINCIPAL ---");
         System.out.println("1. Gestionar Agricultores");
@@ -161,7 +172,6 @@ public class GestionParcelas {
         System.out.println("3. Gestionar Parcelas");
         System.out.println("4. Listar todos los datos");
         System.out.println("5. Salir");
-        System.out.print("Selecciona una opción: ");
     }
 
     private static void gestionarAgricultores() {
@@ -174,10 +184,8 @@ public class GestionParcelas {
             System.out.println("3. Modificar Agricultor");
             System.out.println("4. Listar Agricultores");
             System.out.println("5. Volver al menú principal");
-
-            System.out.print("Seleccione una opción: ");
-            int opcion = scanner.nextInt();
-            scanner.nextLine(); // Limpiar buffer
+            
+            int opcion = leerEntero("Selecciona una opción: ");
 
             switch (opcion) {
                 case 1 ->
@@ -204,7 +212,7 @@ public class GestionParcelas {
         System.out.print("Password del agricultor: ");
         String password = scanner.nextLine();
 
-        Agricultor agricultor = new Agricultor(id, nombre, password, ""); // Especialidad vacía por ahora
+        Agricultor agricultor = new Agricultor(id, nombre, password);
         agricultores.add(agricultor);
         guardarAgricultoresEnArchivo();
         System.out.println("Agricultor añadido correctamente.");
@@ -216,7 +224,7 @@ public class GestionParcelas {
         String id = scanner.nextLine();
 
         // Creamos un agricultor temporal con el ID a eliminar para usar el método borrarTodos
-        Agricultor agricultorAEliminar = new Agricultor(id, "", "", "");
+        Agricultor agricultorAEliminar = new Agricultor(id, "", "");
 
         // Intentamos borrar todos los agricultores con el ID proporcionado
         boolean eliminada = agricultores.borrarTodos(agricultorAEliminar);
@@ -233,7 +241,7 @@ public class GestionParcelas {
         System.out.print("ID de la persona a modificar: ");
         String id = scanner.nextLine();
 
-        Agricultor agricultorAEncontrar = new Agricultor(id, "", "", "");
+        Agricultor agricultorAEncontrar = new Agricultor(id, "", "");
 
         // Buscamos la persona en la lista manual
         Nodo<Agricultor> nodoActual = agricultores.getNodoInicial(); // Método que retorna el nodo inicial de la lista
@@ -275,9 +283,7 @@ public class GestionParcelas {
             System.out.println("4. Listar Máquinas");
             System.out.println("5. Volver al menú principal");
 
-            System.out.print("Seleccione una opción: ");
-            int opcion = scanner.nextInt();
-            scanner.nextLine(); // Limpiar buffer
+            int opcion = leerEntero("Selecciona una opción: ");
 
             switch (opcion) {
                 case 1 ->
@@ -364,9 +370,7 @@ public class GestionParcelas {
             System.out.println("4. Listar Parcelas");
             System.out.println("5. Volver al menú principal");
 
-            System.out.print("Seleccione una opción: ");
-            int opcion = scanner.nextInt();
-            scanner.nextLine(); // Limpiar buffer
+            int opcion = leerEntero("Selecciona una opción: ");
 
             switch (opcion) {
                 case 1 ->
