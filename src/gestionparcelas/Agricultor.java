@@ -5,13 +5,13 @@ package gestionparcelas;
  *
  * @author Eduardo Olalde
  */
-public abstract class Persona {
+public class Agricultor {
     
     private String id;
     private String nombre;
     private String password;
 
-    public Persona(String id, String nombre, String password, String especialidad) {
+    public Agricultor(String id, String nombre, String password, String especialidad) {
         this.id = id;
         this.nombre = nombre;
         this.password = password;
@@ -52,7 +52,7 @@ public abstract class Persona {
     public boolean equals(Object obj) {
         if (this == obj) return true;
         if (obj == null || getClass() != obj.getClass()) return false;
-        Persona persona = (Persona) obj;
+        Agricultor persona = (Agricultor) obj;
         return id.equals(persona.id);
     }
 

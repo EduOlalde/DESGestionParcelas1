@@ -10,7 +10,7 @@ public class Trabajo {
     // Atributos
     private int id;
     private Parcela parcela;
-    private Persona agricultor;
+    private Agricultor agricultor;
     private Maquina maquina;
     private String tipo; // "arar", "sembrar", "cosechar", "fumigar", etc.
     private Date fechaInicio;
@@ -26,7 +26,7 @@ public class Trabajo {
     }
 
     // Métodos
-    public void asignarAgricultor(Persona agricultor) {
+    public void asignarAgricultor(Agricultor agricultor) {
         this.agricultor = agricultor;
     }
 
@@ -51,7 +51,7 @@ public class Trabajo {
     public Parcela getParcela() { return parcela; }
     public void setParcela(Parcela parcela) { this.parcela = parcela; }
 
-    public Persona getAgricultor() { return agricultor; }
+    public Agricultor getAgricultor() { return agricultor; }
     public Maquina getMaquina() { return maquina; }
     
     public String getTipo() { return tipo; }
