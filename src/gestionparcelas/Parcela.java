@@ -57,12 +57,13 @@ public class Parcela {
         System.out.println("Trabajo " + trabajo.getId() + " asignado a la parcela " + id);
     }
 
-    // Método para mostrar la información de la parcela
-    public void mostrarInformacion() {
-        System.out.println("ID: " + id);
-        System.out.println("Ubicación: " + ubicacion);
-        System.out.println("Extensión: " + extension + " hectáreas");
-        System.out.println("Cultivo: " + cultivo);
+    
+    @Override
+    public String toString() {
+        return "ID: " + id + "\n" +
+           "Ubicación: " + ubicacion + "\n" +
+           "Extensión: " + extension + " hectáreas\n" +
+           "Cultivo: " + cultivo;
     }
     
     @Override

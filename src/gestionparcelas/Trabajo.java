@@ -1,14 +1,15 @@
-
 package gestionparcelas;
+
 import java.util.Date;
+
 /**
  *
  * @author Eduardo Olalde
  */
 public class Trabajo {
-    
+
     // Atributos
-    private int id;
+    private final int id;
     private Parcela parcela;
     private Agricultor agricultor;
     private Maquina maquina;
@@ -34,34 +35,59 @@ public class Trabajo {
         this.maquina = maquina;
     }
 
-    public void mostrarInformacion() {
-        System.out.println("ID de Trabajo: " + id);
-        System.out.println("Parcela: " + (parcela != null ? parcela.toString() : "No asignada"));
-        System.out.println("Agricultor: " + (agricultor != null ? agricultor.toString() : "No asignado"));
-        System.out.println("Maquina: " + (maquina != null ? maquina.toString() : "No asignada"));
-        System.out.println("Tipo de trabajo: " + tipo);
-        System.out.println("Fecha de Inicio: " + fechaInicio);
-        System.out.println("Fecha de Fin: " + fechaFin);
+    @Override
+    public String toString() {
+        return "ID de Trabajo: " + id + "\n"
+                + "Parcela: " + (parcela != null ? parcela.toString() : "No asignada") + "\n"
+                + "Agricultor: " + (agricultor != null ? agricultor.toString() : "No asignado") + "\n"
+                + "Maquina: " + (maquina != null ? maquina.toString() : "No asignada") + "\n"
+                + "Tipo de trabajo: " + tipo + "\n"
+                + "Fecha de Inicio: " + fechaInicio + "\n"
+                + "Fecha de Fin: " + fechaFin;
     }
 
     // Getters y setters opcionales, si necesitas acceso directo a los atributos
-    public int getId() { return id; }
-    public void setId(int id) { this.id = id; }
-    
-    public Parcela getParcela() { return parcela; }
-    public void setParcela(Parcela parcela) { this.parcela = parcela; }
+    public int getId() {
+        return id;
+    }
 
-    public Agricultor getAgricultor() { return agricultor; }
-    public Maquina getMaquina() { return maquina; }
-    
-    public String getTipo() { return tipo; }
-    public void setTipo(String tipo) { this.tipo = tipo; }
+    public Parcela getParcela() {
+        return parcela;
+    }
 
-    public Date getFechaInicio() { return fechaInicio; }
-    public void setFechaInicio(Date fechaInicio) { this.fechaInicio = fechaInicio; }
+    public void setParcela(Parcela parcela) {
+        this.parcela = parcela;
+    }
 
-    public Date getFechaFin() { return fechaFin; }
-    public void setFechaFin(Date fechaFin) { this.fechaFin = fechaFin; }
+    public Agricultor getAgricultor() {
+        return agricultor;
+    }
+
+    public Maquina getMaquina() {
+        return maquina;
+    }
+
+    public String getTipo() {
+        return tipo;
+    }
+
+    public void setTipo(String tipo) {
+        this.tipo = tipo;
+    }
+
+    public Date getFechaInicio() {
+        return fechaInicio;
+    }
+
+    public void setFechaInicio(Date fechaInicio) {
+        this.fechaInicio = fechaInicio;
+    }
+
+    public Date getFechaFin() {
+        return fechaFin;
+    }
+
+    public void setFechaFin(Date fechaFin) {
+        this.fechaFin = fechaFin;
+    }
 }
-    
-

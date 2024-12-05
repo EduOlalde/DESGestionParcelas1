@@ -1,4 +1,3 @@
-
 package gestionparcelas;
 
 /**
@@ -6,7 +5,7 @@ package gestionparcelas;
  * @author Eduardo Olalde
  */
 public class Agricultor {
-    
+
     private int id;
     private String nombre;
     private String password;
@@ -40,22 +39,23 @@ public class Agricultor {
     public void setPassword(String password) {
         this.password = password;
     }
-    
-    
-    // Método para mostrar la información del agricultor
-    public void mostrarInformacion() {
-        System.out.println("Nombre: " + nombre);
-        System.out.println("id: " + id);
+
+    @Override
+    public String toString() {
+        return "Nombre: " + nombre + "\n"
+                + "ID: " + id;
     }
-    
+
     @Override
     public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (obj == null || getClass() != obj.getClass()) return false;
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
         Agricultor persona = (Agricultor) obj;
         return id == (persona.id);
     }
 
-    
-    
 }

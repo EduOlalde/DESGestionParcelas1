@@ -3,6 +3,7 @@ package gestionparcelas;
 import ListasTemplates.*;
 import java.util.Scanner;
 import java.io.*;
+import java.util.Date;
 
 /**
  *
@@ -10,9 +11,11 @@ import java.io.*;
  */
 public class GestionParcelas {
 
+    // Listas estáticas para manejar los datos
     private static Lista<Agricultor> agricultores = new Lista<>();
     private static Lista<Maquina> maquinas = new Lista<>();
     private static Lista<Parcela> parcelas = new Lista<>();
+    private static Lista<Trabajo> trabajos = new Lista<>();
     private static Scanner scanner = new Scanner(System.in);
 
     public static void main(String[] args) {
@@ -20,6 +23,7 @@ public class GestionParcelas {
         cargarAgricultoresDesdeArchivo();
         cargarMaquinasDesdeArchivo();
         cargarParcelasDesdeArchivo();
+        cargarTrabajosDesdeArchivo();
 
         // Menú principal
         boolean salir = false;
@@ -38,9 +42,12 @@ public class GestionParcelas {
                     gestionarParcelas();
                     break;
                 case 4:
-                    listarDatos();
+                    gestionarTrabajos();
                     break;
                 case 5:
+                    listarDatos();
+                    break;
+                case 6:
                     salir = true;
                     System.out.println("¡Hasta luego!");
                     break;
@@ -59,6 +66,11 @@ public class GestionParcelas {
                 System.out.println("Por favor, ingrese un número válido.");
             }
         }
+    }
+
+    private static String leerCadena(String mensaje) {
+        System.out.print(mensaje);
+        return scanner.nextLine();
     }
 
     private static void guardarAgricultoresEnArchivo() {
@@ -165,13 +177,74 @@ public class GestionParcelas {
         }
     }
 
+    private static void guardarTrabajosEnArchivo() {
+        try (PrintWriter writer = new PrintWriter(new FileWriter("trabajos.txt"))) {
+            Nodo<Trabajo> nodo = trabajos.getNodoInicial();
+            while (nodo != null) {
+                Trabajo trabajo = nodo.getInf();
+                // Escribimos los datos del trabajo en formato CSV
+                writer.println(
+                        trabajo.getId() + ","
+                        + trabajo.getParcela().getId() + ","
+                        + trabajo.getTipo() + ","
+                        + (trabajo.getFechaInicio() != null ? trabajo.getFechaInicio().toString() : "") + ","
+                        + (trabajo.getFechaFin() != null ? trabajo.getFechaFin().toString() : "")
+                );
+                nodo = nodo.getSig();
+            }
+            System.out.println("Datos de trabajos guardados correctamente.");
+        } catch (IOException e) {
+            System.out.println("Error al guardar los datos de trabajos: " + e.getMessage());
+        }
+    }
+
+    private static void cargarTrabajosDesdeArchivo() {
+        try (BufferedReader reader = new BufferedReader(new FileReader("trabajos.txt"))) {
+            String linea;
+            while ((linea = reader.readLine()) != null) {
+                // Dividimos la línea en partes usando la coma como separador
+                String[] datos = linea.split(",");
+                if (datos.length == 5) { // Validamos que haya exactamente 5 campos
+                    int id = Integer.parseInt(datos[0]);
+                    int parcelaId = Integer.parseInt(datos[1]);
+                    String tipo = datos[2];
+                    String fechaInicioStr = datos[3];
+                    String fechaFinStr = datos[4];
+
+                    // Convertimos las fechas de String a Date si no están vacías
+                    Date fechaInicio = null;
+                    Date fechaFin = null;
+
+                    if (!fechaInicioStr.isEmpty()) {
+                        fechaInicio = new Date(fechaInicioStr); // Suponiendo formato "yyyy-MM-dd"
+                    }
+
+                    if (!fechaFinStr.isEmpty()) {
+                        fechaFin = new Date(fechaFinStr); // Suponiendo formato "yyyy-MM-dd"
+                    }
+
+                    // Creamos el objeto Trabajo y lo agregamos a la lista
+                    Parcela parcela = new Parcela(parcelaId, "", 0, ""); // Este es solo un ejemplo, busca la parcela por ID
+                    Trabajo trabajo = new Trabajo(id, parcela, tipo, fechaInicio, fechaFin);
+                    trabajos.add(trabajo); // Agregamos el trabajo a la lista
+                }
+            }
+            System.out.println("Datos de trabajos cargados correctamente.");
+        } catch (FileNotFoundException e) {
+            System.out.println("Archivo de trabajos no encontrado. Se iniciará con una lista vacía.");
+        } catch (IOException e) {
+            System.out.println("Error al cargar los datos de trabajos: " + e.getMessage());
+        }
+    }
+
     private static void mostrarMenu() {
         System.out.println("\n--- MENÚ PRINCIPAL ---");
         System.out.println("1. Gestionar Agricultores");
         System.out.println("2. Gestionar Máquinas");
         System.out.println("3. Gestionar Parcelas");
-        System.out.println("4. Listar todos los datos");
-        System.out.println("5. Salir");
+        System.out.println("4. Gestionar Trabajos");
+        System.out.println("5. Listar todos los datos");
+        System.out.println("6. Salir");
     }
 
     private static void gestionarAgricultores() {
@@ -208,9 +281,9 @@ public class GestionParcelas {
         System.out.print("ID del agricultor, ");
         int id = leerEntero("introduce un número entero:");
         System.out.print("Nombre del agricultor: ");
-        String nombre = scanner.nextLine();
+        String nombre = leerCadena("");
         System.out.print("Password del agricultor: ");
-        String password = scanner.nextLine();
+        String password = leerCadena("");
 
         Agricultor agricultor = new Agricultor(id, nombre, password);
 
@@ -266,9 +339,9 @@ public class GestionParcelas {
                 // Agricultor encontrada, modificar sus datos
                 Agricultor persona = nodoActual.getInf();
                 System.out.print("Nuevo nombre: ");
-                persona.setNombre(scanner.nextLine());
+                persona.setNombre(leerCadena(""));
                 System.out.print("Nueva password: ");
-                persona.setPassword(scanner.nextLine());
+                persona.setPassword(leerCadena(""));
                 System.out.println("Agricultor modificado.");
                 guardarAgricultoresEnArchivo();
                 return;
@@ -283,7 +356,7 @@ public class GestionParcelas {
         System.out.println("\nAgricultores:");
         Nodo<Agricultor> nodo = agricultores.getNodoInicial();
         while (nodo != null) {
-            nodo.getInf().mostrarInformacion();
+            System.out.println(nodo.getInf().toString() + "\n");
             nodo = nodo.getSig();
         }
     }
@@ -297,7 +370,8 @@ public class GestionParcelas {
             System.out.println("2. Baja de Máquina");
             System.out.println("3. Modificar Máquina");
             System.out.println("4. Listar Máquinas");
-            System.out.println("5. Volver al menú principal");
+            System.out.println("5. Listar Máquinas Libres");
+            System.out.println("6. Volver al menú principal");
 
             int opcion = leerEntero("Selecciona una opción: ");
 
@@ -311,6 +385,8 @@ public class GestionParcelas {
                 case 4 ->
                     listarMaquinas();
                 case 5 ->
+                    listarMaquinasLibres();
+                case 6 ->
                     salir = true;
                 default ->
                     System.out.println("Opción no válida. Intente nuevamente.");
@@ -320,11 +396,11 @@ public class GestionParcelas {
 
     private static void altaMaquina() {
         System.out.print("Tipo de máquina: ");
-        String tipo = scanner.nextLine();
+        String tipo = leerCadena("");
         System.out.print("Modelo de máquina: ");
-        String modelo = scanner.nextLine();
+        String modelo = leerCadena("");
         System.out.print("Estado de máquina: ");
-        String estado = scanner.nextLine();
+        String estado = leerCadena("");
 
         Maquina maquina = new Maquina(tipo, modelo, estado);
         maquinas.add(maquina);
@@ -334,7 +410,7 @@ public class GestionParcelas {
 
     private static void bajaMaquina() {
         System.out.print("Modelo de la máquina a eliminar: ");
-        String modelo = scanner.nextLine();
+        String modelo = leerCadena("");
         Maquina temp = new Maquina("", modelo, "");
 
         if (maquinas.borrarTodos(temp)) {
@@ -347,16 +423,16 @@ public class GestionParcelas {
 
     private static void modificarMaquina() {
         System.out.print("Modelo de la máquina a modificar: ");
-        String modelo = scanner.nextLine();
+        String modelo = leerCadena("");
 
         Nodo<Maquina> nodo = maquinas.getNodoInicial();
         while (nodo != null) {
             Maquina maquina = nodo.getInf();
             if (maquina.getModelo().equals(modelo)) {
                 System.out.print("Nuevo tipo: ");
-                maquina.setTipo(scanner.nextLine());
+                maquina.setTipo(leerCadena(""));
                 System.out.print("Nuevo estado: ");
-                maquina.setEstado(scanner.nextLine());
+                maquina.setEstado(leerCadena(""));
                 System.out.println("Máquina modificada correctamente.");
                 guardarMaquinasEnArchivo();
                 return;
@@ -370,7 +446,7 @@ public class GestionParcelas {
         System.out.println("\nMáquinas:");
         Nodo<Maquina> nodo = maquinas.getNodoInicial();
         while (nodo != null) {
-            nodo.getInf().mostrarInformacion();
+            System.out.println(nodo.getInf() + "\n"); 
             nodo = nodo.getSig();
         }
     }
@@ -407,15 +483,15 @@ public class GestionParcelas {
 
     private static void altaParcela() {
         System.out.print("ID de la parcela: ");
-        int id = scanner.nextInt();
+        int id = leerEntero("");
         scanner.nextLine(); // Limpiar buffer
         System.out.print("Ubicación: ");
-        String ubicacion = scanner.nextLine();
+        String ubicacion = leerCadena("");
         System.out.print("Extensión (en hectáreas): ");
         double extension = scanner.nextDouble();
         scanner.nextLine(); // Limpiar buffer
         System.out.print("Cultivo: ");
-        String cultivo = scanner.nextLine();
+        String cultivo = leerCadena("");
 
         // Crear la nueva parcela
         Parcela parcela = new Parcela(id, ubicacion, extension, cultivo);
@@ -443,7 +519,7 @@ public class GestionParcelas {
 
     private static void bajaParcela() {
         System.out.print("ID de la parcela a eliminar: ");
-        int id = scanner.nextInt();
+        int id = leerEntero("");
         scanner.nextLine(); // Limpiar buffer
         Parcela temp = new Parcela(id, "", 0, "");
 
@@ -457,7 +533,7 @@ public class GestionParcelas {
 
     private static void modificarParcela() {
         System.out.print("ID de la parcela a modificar: ");
-        int id = scanner.nextInt();
+        int id = leerEntero("");
         scanner.nextLine(); // Limpiar buffer
 
         Nodo<Parcela> nodo = parcelas.getNodoInicial();
@@ -465,12 +541,12 @@ public class GestionParcelas {
             Parcela parcela = nodo.getInf();
             if (parcela.getId() == id) {
                 System.out.print("Nueva ubicación: ");
-                parcela.setUbicacion(scanner.nextLine());
+                parcela.setUbicacion(leerCadena(""));
                 System.out.print("Nueva extensión (en hectáreas): ");
                 parcela.setExtension(scanner.nextDouble());
                 scanner.nextLine(); // Limpiar buffer
                 System.out.print("Nuevo cultivo: ");
-                parcela.setCultivo(scanner.nextLine());
+                parcela.setCultivo(leerCadena(""));
                 System.out.println("Parcela modificada correctamente.");
                 guardarParcelasEnArchivo();
                 return;
@@ -484,33 +560,251 @@ public class GestionParcelas {
         System.out.println("\nParcelas:");
         Nodo<Parcela> nodo = parcelas.getNodoInicial();
         while (nodo != null) {
-            nodo.getInf().mostrarInformacion();
+            System.out.println(nodo.getInf().toString() + "\n");
             nodo = nodo.getSig();
         }
     }
 
     private static void listarDatos() {
         System.out.println("\n--- LISTADO ---");
+        
+        listarAgricultores();       
+        listarMaquinas();        
+        listarParcelas();
+        listarTrabajos();
+    }
 
-        System.out.println("\nPersonas:");
-        Nodo<Agricultor> nodoPersona = agricultores.getNodoInicial();
-        while (nodoPersona != null) {
-            nodoPersona.getInf().mostrarInformacion();
-            nodoPersona = nodoPersona.getSig();
+    private static void gestionarTrabajos() {
+        boolean salir = false;
+        while (!salir) {
+            System.out.println("\n--- Menú de Gestión de Trabajos ---");
+            System.out.println("1. Asignar trabajo");
+            System.out.println("2. Finalizar trabajo");
+            System.out.println("3. Listar trabajos");
+            System.out.println("4. Volver al menú principal");
+            int opcionTrabajo = leerEntero("Selecciona una opción para gestionar los trabajos: ");
+
+            switch (opcionTrabajo) {
+                case 1:
+                    asignarTrabajo();
+                    break;
+                case 2:
+                    finalizarTrabajo();
+                    break;
+                case 3:
+                    listarTrabajos();
+                    break;
+                case 4:
+                    salir = true;
+                    break;
+                default:
+                    System.out.println("Opción no válida. Por favor, selecciona una opción válida.");
+            }
         }
+    }
 
-        System.out.println("\nMáquinas:");
+    private static void asignarTrabajo() {
+        // Mostrar las parcelas disponibles
+        System.out.println("Seleccione una parcela:");
+        Nodo<Parcela> nodoParcela = parcelas.getNodoInicial();
+        while (nodoParcela != null) {
+            Parcela parcela = nodoParcela.getInf();
+            System.out.println(parcela.getId() + ". " + parcela.getUbicacion());
+            nodoParcela = nodoParcela.getSig();
+        }
+        int parcelaId = leerEntero("Ingrese el ID de la parcela: ");
+        Parcela parcelaSeleccionada = buscarParcelaPorId(parcelaId);
+
+        // Mostrar las máquinas disponibles
+        System.out.println("Seleccione una máquina:");
         Nodo<Maquina> nodoMaquina = maquinas.getNodoInicial();
         while (nodoMaquina != null) {
-            nodoMaquina.getInf().mostrarInformacion();
+            Maquina maquina = nodoMaquina.getInf();
+            System.out.println(maquina.getId() + ". " + maquina.getModelo());
+            nodoMaquina = nodoMaquina.getSig();
+        }
+        int maquinaId = leerEntero("Ingrese el ID de la máquina: ");
+        Maquina maquinaSeleccionada = buscarMaquinaPorId(maquinaId);
+
+        // Solicitar el tipo de trabajo
+        String tipoTrabajo = leerCadena("Ingrese el tipo de trabajo (ej. 'arar', 'sembrar', etc.): ");
+
+        // Solicitar fechas de inicio y fin
+        Date fechaInicio = null;
+
+        System.out.println("Ingrese la fecha de inicio (formato: yyyy-MM-dd):");
+        String fechaInicioStr = leerCadena("");
+        if (!fechaInicioStr.isEmpty()) {
+            fechaInicio = new Date(fechaInicioStr); // Convertir a Date
+        }
+
+        // Calcular el ID del nuevo trabajo
+        int idTrabajo = 1;
+        Nodo<Trabajo> nodoTrabajo = trabajos.getNodoInicial();
+        while (nodoTrabajo != null) {
+            idTrabajo++;
+            nodoTrabajo = nodoTrabajo.getSig();
+        }
+
+        // Crear el trabajo
+        Trabajo trabajo = new Trabajo(idTrabajo, parcelaSeleccionada, tipoTrabajo, fechaInicio, null);
+
+        // Asignar la máquina y, opcionalmente, un agricultor
+        trabajo.asignarMaquina(maquinaSeleccionada);
+
+        // Si se tiene un agricultor disponible, asignarlo también
+        Agricultor agricultorSeleccionado = seleccionarAgricultor();
+        if (agricultorSeleccionado != null) {
+            trabajo.asignarAgricultor(agricultorSeleccionado);
+        }
+
+        // Agregar el trabajo a la lista
+        trabajos.add(trabajo);
+
+        // Mostrar información del trabajo creado
+        System.out.println("Trabajo creado:");
+        System.out.println(trabajo.toString());
+
+        // Guardar trabajos en el archivo
+        guardarTrabajosEnArchivo();
+    }
+
+    private static void finalizarTrabajo() {
+        // Solicitar al usuario el ID del trabajo que desea finalizar
+        int idTrabajo = leerEntero("Ingrese el ID del trabajo a finalizar: ");
+
+        // Buscar el trabajo en la lista de trabajos
+        Nodo<Trabajo> nodoTrabajo = trabajos.getNodoInicial();
+        boolean trabajoEncontrado = false;
+
+        while (nodoTrabajo != null) {
+            Trabajo trabajo = nodoTrabajo.getInf();
+
+            // Verificar si el trabajo tiene el ID proporcionado
+            if (trabajo.getId() == idTrabajo) {
+                trabajoEncontrado = true;
+
+                // Solicitar la fecha de fin
+                System.out.println("Ingrese la fecha de fin (formato: yyyy-MM-dd):");
+                String fechaFinStr = leerCadena("");
+                Date fechaFin = null;
+
+                if (!fechaFinStr.isEmpty()) {
+                    fechaFin = new Date(fechaFinStr); // Convertir a Date
+                    trabajo.setFechaFin(fechaFin); // Asignar la fecha de fin al trabajo
+                    System.out.println("Trabajo finalizado con éxito.");
+                    break;
+                } else {
+                    System.out.println("Fecha de fin no válida.");
+                }
+            }
+
+            nodoTrabajo = nodoTrabajo.getSig();
+        }
+
+        if (!trabajoEncontrado) {
+            System.out.println("Trabajo con ID " + idTrabajo + " no encontrado.");
+        }
+
+        // Guardar trabajos en el archivo después de modificar el estado
+        guardarTrabajosEnArchivo();
+    }
+
+    private static Parcela buscarParcelaPorId(int id) {
+        Nodo<Parcela> nodo = parcelas.getNodoInicial();
+        while (nodo != null) {
+            if (nodo.getInf().getId() == id) {
+                return nodo.getInf();
+            }
+            nodo = nodo.getSig();
+        }
+        return null; // Retorna null si no encuentra la parcela
+    }
+
+    private static Maquina buscarMaquinaPorId(int id) {
+        Nodo<Maquina> nodo = maquinas.getNodoInicial();
+        while (nodo != null) {
+            if (nodo.getInf().getId() == id) {
+                return nodo.getInf();
+            }
+            nodo = nodo.getSig();
+        }
+        return null; // Retorna null si no encuentra la máquina
+    }
+
+    private static Agricultor seleccionarAgricultor() {
+        // Si necesitas seleccionar un agricultor, puedes agregar una función similar a la de máquina o parcela
+        System.out.println("Seleccione un agricultor:");
+        Nodo<Agricultor> nodoAgricultor = agricultores.getNodoInicial();
+        while (nodoAgricultor != null) {
+            Agricultor agricultor = nodoAgricultor.getInf();
+            System.out.println(agricultor.getId() + ". " + agricultor.getNombre());
+            nodoAgricultor = nodoAgricultor.getSig();
+        }
+        int agricultorId = leerEntero("Ingrese el ID del agricultor (0 para ninguno): ");
+        if (agricultorId == 0) {
+            return null; // No se asigna agricultor
+        }
+        return buscarAgricultorPorId(agricultorId); // Implementa esta búsqueda
+    }
+
+    private static Agricultor buscarAgricultorPorId(int id) {
+        Nodo<Agricultor> nodo = agricultores.getNodoInicial();
+        while (nodo != null) {
+            if (nodo.getInf().getId() == id) {
+                return nodo.getInf();
+            }
+            nodo = nodo.getSig();
+        }
+        return null; // Retorna null si no encuentra el agricultor
+    }
+
+    private static void listarMaquinasLibres() {
+        // Crear la cola de máquinas libres
+        Cola<Maquina> maquinasLibres = new Cola<>();
+
+        // Recorrer la lista de máquinas y encolar las que están libres
+        Nodo<Maquina> nodoMaquina = maquinas.getNodoInicial();
+        while (nodoMaquina != null) {
+            Maquina maquina = nodoMaquina.getInf();
+            if ("libre".equals(maquina.getEstado())) {
+                maquinasLibres.encolar(maquina);
+            }
             nodoMaquina = nodoMaquina.getSig();
         }
 
-        System.out.println("\nParcelas:");
-        Nodo<Parcela> nodoParcela = parcelas.getNodoInicial();
-        while (nodoParcela != null) {
-            nodoParcela.getInf().mostrarInformacion();
-            nodoParcela = nodoParcela.getSig();
+        // Mostrar las máquinas libres
+        System.out.println("Máquinas libres:");
+        Nodo<Maquina> nodo = maquinasLibres.getNodoInicio();
+        while (nodo != null) {
+            Maquina maquina = nodo.getInf();
+            System.out.println(maquina.getId() + ". " + maquina.getModelo());
+            nodo = nodo.getSig();
+        }
+
+        if (maquinasLibres.esVacia()) {
+            System.out.println("No hay máquinas libres.");
+        }
+    }
+
+    private static void listarTrabajos() {
+        // Recorrer la lista de trabajos y mostrar su estado
+        Nodo<Trabajo> nodoTrabajo = trabajos.getNodoInicial();
+
+        if (nodoTrabajo == null) {
+            System.out.println("No hay trabajos registrados.");
+            return;
+        }
+
+        System.out.println("Lista de trabajos:");
+        while (nodoTrabajo != null) {
+            Trabajo trabajo = nodoTrabajo.getInf();
+            String estado = (trabajo.getFechaFin() == null) ? "Asignado" : "Terminado";
+            System.out.println("Trabajo ID: " + trabajo.getId()
+                    + " | Parcela: " + trabajo.getParcela().getUbicacion()
+                    + " | Tipo: " + trabajo.getTipo()
+                    + " | Estado: " + estado);
+            nodoTrabajo = nodoTrabajo.getSig();
         }
     }
 

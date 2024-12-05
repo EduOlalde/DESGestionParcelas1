@@ -1,4 +1,3 @@
-
 package gestionparcelas;
 
 /**
@@ -7,10 +6,10 @@ package gestionparcelas;
  */
 public class Maquina {
 
+    private int id;
     private String tipo;
     private String modelo;
     private String estado;
-    
 
     // Constructor
     public Maquina(String tipo, String modelo, String estado) {
@@ -20,6 +19,10 @@ public class Maquina {
     }
 
     // Getters
+    public int getId() {
+        return id;
+    }
+
     public String getTipo() {
         return tipo;
     }
@@ -32,7 +35,11 @@ public class Maquina {
         return estado;
     }
 
-    // Setters (opcional, si necesitas modificar los datos de la máquina)
+    // Setters
+    public void setId(int id) {
+        this.id = id;
+    }
+
     public void setTipo(String tipo) {
         this.tipo = tipo;
     }
@@ -53,19 +60,24 @@ public class Maquina {
         System.out.println(this.tipo + " " + this.modelo + " asignada al trabajo " + trabajo.getId());
     }
 
-    // Método para mostrar la información de la máquina
-    public void mostrarInformacion() {
-        System.out.println("Tipo: " + tipo);
-        System.out.println("Modelo: " + modelo);
-        System.out.println("Estado: " + estado);
+    @Override
+    public String toString() {
+        return "ID de Máquina: " + id + "\n"
+                + "Tipo: " + tipo + "\n"
+                + "Modelo: " + modelo + "\n"
+                + "Estado: " + estado;
     }
-    
+
     @Override
     public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (obj == null || getClass() != obj.getClass()) return false;
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
         Maquina maquina = (Maquina) obj;
-        return modelo.equals(maquina.modelo);
+        return id == maquina.id;
     }
 
 }
