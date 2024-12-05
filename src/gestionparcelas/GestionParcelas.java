@@ -14,7 +14,7 @@ public class GestionParcelas {
     private static Lista<Maquina> maquinas = new Lista<>();
     private static Lista<Parcela> parcelas = new Lista<>();
     private static Scanner scanner = new Scanner(System.in);
-    
+
     public static void main(String[] args) {
         // Cargar datos al inicio
         cargarAgricultoresDesdeArchivo();
@@ -49,18 +49,17 @@ public class GestionParcelas {
             }
         }
     }
-    
+
     private static int leerEntero(String mensaje) {
-    while (true) {
-        try {
-            System.out.print(mensaje);
-            return Integer.parseInt(scanner.nextLine());
-        } catch (NumberFormatException e) {
-            System.out.println("Por favor, ingrese un número válido.");
+        while (true) {
+            try {
+                System.out.print(mensaje);
+                return Integer.parseInt(scanner.nextLine());
+            } catch (NumberFormatException e) {
+                System.out.println("Por favor, ingrese un número válido.");
+            }
         }
     }
-}
-
 
     private static void guardarAgricultoresEnArchivo() {
         try (PrintWriter writer = new PrintWriter(new FileWriter("agricultores.txt"))) {
@@ -82,7 +81,8 @@ public class GestionParcelas {
             while ((linea = reader.readLine()) != null) {
                 String[] datos = linea.split(",");
                 if (datos.length == 3) {
-                    Agricultor agricultor = new Agricultor(datos[0], datos[1], datos[2]);
+                    int id = Integer.parseInt(datos[0]); // Recoger el id como entero
+                    Agricultor agricultor = new Agricultor(id, datos[1], datos[2]);
                     agricultores.add(agricultor);
                 }
             }
@@ -184,7 +184,7 @@ public class GestionParcelas {
             System.out.println("3. Modificar Agricultor");
             System.out.println("4. Listar Agricultores");
             System.out.println("5. Volver al menú principal");
-            
+
             int opcion = leerEntero("Selecciona una opción: ");
 
             switch (opcion) {
@@ -205,23 +205,39 @@ public class GestionParcelas {
     }
 
     private static void altaAgricultor() {
-        System.out.print("ID del agricultor: ");
-        String id = scanner.nextLine();
+        System.out.print("ID del agricultor, ");
+        int id = leerEntero("introduce un número entero:");
         System.out.print("Nombre del agricultor: ");
         String nombre = scanner.nextLine();
         System.out.print("Password del agricultor: ");
         String password = scanner.nextLine();
 
         Agricultor agricultor = new Agricultor(id, nombre, password);
-        agricultores.add(agricultor);
-        guardarAgricultoresEnArchivo();
-        System.out.println("Agricultor añadido correctamente.");
 
+        // Verificamos si ya existe un agricultor con el mismo id
+        boolean yaExiste = false;
+        Nodo<Agricultor> nodo = agricultores.getNodoInicial();
+        while (nodo != null) {
+            Agricultor agricultorExistente = nodo.getInf();
+            if (agricultorExistente.getId() == agricultor.getId()) { // Comparamos las IDs
+                yaExiste = true;
+                break;
+            }
+            nodo = nodo.getSig();
+        }
+
+        if (yaExiste) {
+            System.out.println("Error: Ya existe un agricultor con la misma ID.");
+        } else {
+            agricultores.add(agricultor);
+            guardarAgricultoresEnArchivo();
+            System.out.println("Agricultor añadido correctamente.");
+        }
     }
 
     private static void bajaAgricultor() {
-        System.out.print("ID del agricultor a eliminar: ");
-        String id = scanner.nextLine();
+        System.out.print("ID del agricultor a eliminar, ");
+        int id = leerEntero("introduce un número entero: ");
 
         // Creamos un agricultor temporal con el ID a eliminar para usar el método borrarTodos
         Agricultor agricultorAEliminar = new Agricultor(id, "", "");
@@ -238,8 +254,8 @@ public class GestionParcelas {
     }
 
     private static void modificarAgricultor() {
-        System.out.print("ID de la persona a modificar: ");
-        String id = scanner.nextLine();
+        System.out.print("ID de la persona a modificar, ");
+        int id = leerEntero("introduce un número entero:");
 
         Agricultor agricultorAEncontrar = new Agricultor(id, "", "");
 
@@ -401,10 +417,28 @@ public class GestionParcelas {
         System.out.print("Cultivo: ");
         String cultivo = scanner.nextLine();
 
+        // Crear la nueva parcela
         Parcela parcela = new Parcela(id, ubicacion, extension, cultivo);
-        parcelas.add(parcela);
-        guardarParcelasEnArchivo();
-        System.out.println("Parcela añadida correctamente.");
+
+        // Verificar si ya existe una parcela con el mismo ID
+        boolean yaExiste = false;
+        Nodo<Parcela> nodo = parcelas.getNodoInicial();
+        while (nodo != null) {
+            Parcela parcelaExistente = nodo.getInf();
+            if (parcelaExistente.getId() == parcela.getId()) { // Comparamos las IDs
+                yaExiste = true;
+                break;
+            }
+            nodo = nodo.getSig();
+        }
+
+        if (yaExiste) {
+            System.out.println("Error: Ya existe una parcela con la misma ID.");
+        } else {
+            parcelas.add(parcela);
+            guardarParcelasEnArchivo();
+            System.out.println("Parcela añadida correctamente.");
+        }
     }
 
     private static void bajaParcela() {

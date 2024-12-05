@@ -7,21 +7,21 @@ package gestionparcelas;
  */
 public class Agricultor {
     
-    private String id;
+    private int id;
     private String nombre;
     private String password;
 
-    public Agricultor(String id, String nombre, String password) {
+    public Agricultor(int id, String nombre, String password) {
         this.id = id;
         this.nombre = nombre;
         this.password = password;
     }
 
-    public String getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(int id) {
         this.id = id;
     }
 
@@ -53,7 +53,7 @@ public class Agricultor {
         if (this == obj) return true;
         if (obj == null || getClass() != obj.getClass()) return false;
         Agricultor persona = (Agricultor) obj;
-        return id.equals(persona.id);
+        return id == (persona.id);
     }
 
     

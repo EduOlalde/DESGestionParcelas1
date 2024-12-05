@@ -1,1 +1,5 @@
 build/
+/dist/
+agricultores.txt
+maquinas.txt
+parcelas.txt
