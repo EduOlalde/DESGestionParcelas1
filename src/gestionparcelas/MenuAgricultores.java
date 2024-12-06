@@ -6,9 +6,20 @@ import static gestionparcelas.GestionParcelas.leerCadena;
 import static gestionparcelas.GestionParcelas.leerEntero;
 import static gestionparcelas.GestionParcelas.agricultores;
 
+/**
+ * Clase que gestiona el menú de operaciones relacionadas con los agricultores.
+ * Permite al usuario realizar acciones como alta, baja, modificación, listado
+ * y selección de agricultores. También gestiona la búsqueda de agricultores
+ * por su ID y guarda los datos en archivos.
+ * 
+ * @author Eduardo Olalde
+ */
 public class MenuAgricultores {
 
-    // Método principal del menú de agricultores
+    /**
+     * Muestra el menú de gestión de agricultores y permite al usuario seleccionar
+     * entre varias opciones: alta, baja, modificación, listado o volver al menú principal.
+     */
     public static void mostrarMenu() {
         boolean salir = false;
 
@@ -23,25 +34,23 @@ public class MenuAgricultores {
             int opcion = leerEntero("Selecciona una opción: ");
 
             switch (opcion) {
-                case 1 ->
-                    altaAgricultor();
-                case 2 ->
-                    bajaAgricultor();
-                case 3 ->
-                    modificarAgricultor();
-                case 4 ->
-                    listarAgricultores();
-                case 5 ->
-                    salir = true;
-                default ->
-                    System.out.println("Opción no válida. Intente nuevamente.");
+                case 1 -> altaAgricultor();
+                case 2 -> bajaAgricultor();
+                case 3 -> modificarAgricultor();
+                case 4 -> listarAgricultores();
+                case 5 -> salir = true;
+                default -> System.out.println("Opción no válida. Intente nuevamente.");
             }
         }
     }
 
+    /**
+     * Permite dar de alta a un nuevo agricultor. Se solicita el nombre y la contraseña,
+     * se asigna un ID automáticamente y se guarda el nuevo agricultor en la lista.
+     * También se guarda la lista actualizada en el archivo correspondiente.
+     */
     private static void altaAgricultor() {
         // Generar un nuevo ID automático tomando el último ID + 1
-
         int nuevoId = 1;
         Nodo<Agricultor> nodo = agricultores.getNodoInicial();
         if (nodo != null) {
@@ -57,22 +66,31 @@ public class MenuAgricultores {
         agricultores.add(agricultor);
         guardarAgricultoresEnArchivo(agricultores);
         System.out.println("Agricultor añadido correctamente con ID: " + nuevoId);
-
     }
 
+    /**
+     * Permite eliminar un agricultor existente. Se solicita el ID del agricultor
+     * a eliminar y, si se encuentra en la lista, se elimina. La lista se guarda
+     * después de la eliminación.
+     */
     private static void bajaAgricultor() {
-        System.out.println("Baja de parcela:");
-        int id = leerEntero("ID de la parcela a eliminar: ");
+        System.out.println("Baja de agricultor:");
+        int id = leerEntero("ID del agricultor a eliminar: ");
         Agricultor temp = new Agricultor(id, "", "");
 
         if (agricultores.borrarElemento(temp)) {
             guardarAgricultoresEnArchivo(agricultores);
-            System.out.println("Agricultor eliminada correctamente.");
+            System.out.println("Agricultor eliminado correctamente.");
         } else {
-            System.out.println("Agricultor no encontrada.");
+            System.out.println("Agricultor no encontrado.");
         }
     }
 
+    /**
+     * Permite modificar los datos de un agricultor existente. Se solicita el ID
+     * del agricultor a modificar, y si se encuentra, se actualizan los campos
+     * del agricultor. Luego, la lista se guarda en el archivo correspondiente.
+     */
     private static void modificarAgricultor() {
         int id = leerEntero("ID del agricultor a modificar: ");
 
@@ -92,6 +110,10 @@ public class MenuAgricultores {
         System.out.println("Agricultor no encontrado.");
     }
 
+    /**
+     * Muestra un listado de todos los agricultores registrados. Si no hay agricultores
+     * en la lista, se informa al usuario de que no hay datos disponibles.
+     */
     public static void listarAgricultores() {
         System.out.println("\n--- Agricultores ---");
         Nodo<Agricultor> nodo = agricultores.getNodoInicial();
@@ -106,6 +128,13 @@ public class MenuAgricultores {
         }
     }
 
+    /**
+     * Permite seleccionar un agricultor de la lista de agricultores. Muestra los agricultores
+     * registrados y solicita al usuario que ingrese el ID de un agricultor. Si se elige
+     * un agricultor válido, se retorna el objeto correspondiente, o `null` si no se selecciona ninguno.
+     * 
+     * @return El agricultor seleccionado o `null` si no se selecciona ningún agricultor.
+     */
     public static Agricultor seleccionarAgricultor() {
         System.out.println("Seleccione un agricultor:");
         Nodo<Agricultor> nodoAgricultor = agricultores.getNodoInicial();
@@ -121,6 +150,13 @@ public class MenuAgricultores {
         return buscarAgricultorPorId(agricultorId);
     }
 
+    /**
+     * Busca un agricultor por su ID. Si encuentra un agricultor con el ID dado,
+     * lo retorna. Si no, retorna `null`.
+     * 
+     * @param id El ID del agricultor a buscar.
+     * @return El agricultor encontrado o `null` si no se encuentra el agricultor con el ID dado.
+     */
     public static Agricultor buscarAgricultorPorId(int id) {
         Nodo<Agricultor> nodo = agricultores.getNodoInicial();
         while (nodo != null) {

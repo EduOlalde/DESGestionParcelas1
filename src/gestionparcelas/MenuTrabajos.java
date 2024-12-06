@@ -5,20 +5,33 @@ import static gestionparcelas.GestionFicheros.guardarTrabajosEnArchivo;
 import static gestionparcelas.GestionParcelas.leerCadena;
 import static gestionparcelas.GestionParcelas.leerEntero;
 import static gestionparcelas.GestionParcelas.leerFecha;
-import static gestionparcelas.GestionParcelas.maquinas;
 import static gestionparcelas.GestionParcelas.parcelas;
 import static gestionparcelas.GestionParcelas.trabajos;
 import static gestionparcelas.MenuMaquinas.buscarMaquinaPorId;
 import static gestionparcelas.MenuParcelas.buscarParcelaPorId;
 import gestionparcelas.Maquina.Estado;
-import java.util.Date;
+import java.time.LocalDate;
 
 /**
+ * Esta clase gestiona las operaciones relacionadas con los trabajos en el
+ * sistema. Permite asignar, finalizar y listar los trabajos realizados en las
+ * parcelas, así como gestionar el estado de las máquinas asignadas a los
+ * trabajos.
+ * <p>
+ * El menú interactivo permite al usuario seleccionar una opción para asignar un
+ * trabajo, finalizar un trabajo, listar los trabajos realizados o volver al
+ * menú principal.
+ * </p>
  *
  * @author Eduardo Olalde
  */
 public class MenuTrabajos {
 
+    /**
+     * Muestra el menú principal de gestión de trabajos y permite al usuario
+     * seleccionar una opción para asignar, finalizar o listar trabajos. También
+     * permite regresar al menú principal.
+     */
     public static void mostrarMenu() {
         boolean salir = false;
         while (!salir) {
@@ -44,10 +57,18 @@ public class MenuTrabajos {
         }
     }
 
+    /**
+     * Asigna un trabajo a una máquina y una parcela. Solicita al usuario los
+     * datos necesarios como el tipo de trabajo, la parcela y la máquina, y
+     * guarda la información del trabajo. Además, verifica que haya máquinas
+     * libres para realizar la asignación.
+     */
     private static void asignarTrabajo() {
-        //Comprueba si hay máquinas libres o no permite la asignación
-        if(!MenuMaquinas.listarMaquinasLibres()) return;
-        
+        // Comprueba si hay máquinas libres o no permite la asignación
+        if (!MenuMaquinas.listarMaquinasLibres()) {
+            return;
+        }
+
         // Mostrar las parcelas disponibles
         System.out.println("Seleccione una parcela:");
         Nodo<Parcela> nodoParcela = parcelas.getNodoInicial();
@@ -67,15 +88,14 @@ public class MenuTrabajos {
         // Mostrar las máquinas disponibles
         System.out.println("Seleccione una máquina:");
         MenuMaquinas.listarMaquinasLibres();
-        
+
         int maquinaId = leerEntero("Ingrese el ID de la máquina: ");
         Maquina maquinaSeleccionada = buscarMaquinaPorId(maquinaId);
 
         if (maquinaSeleccionada == null) {
             System.out.println("Máquina no encontrada. Inténtelo de nuevo.");
             return;
-        }
-        else{
+        } else {
             maquinaSeleccionada.setEstado(Estado.asignada);
         }
 
@@ -83,7 +103,7 @@ public class MenuTrabajos {
         String tipoTrabajo = leerCadena("Ingrese el tipo de trabajo (ej. 'arar', 'sembrar', etc.): ");
 
         // Solicitar fecha de inicio
-        Date fechaInicio = leerFecha("Ingrese la fecha de inicio (formato: yyyy-MM-dd): ");
+        LocalDate fechaInicio = leerFecha("Ingrese la fecha de inicio (formato: yyyy-MM-dd): ");
 
         // Calcular el ID del nuevo trabajo (basado en la cantidad actual de trabajos)
         int idTrabajo = 1;
@@ -104,9 +124,15 @@ public class MenuTrabajos {
         System.out.println(trabajo.toString());
 
         // Guardar trabajos en el archivo
-        //guardarTrabajosEnArchivo();
+        guardarTrabajosEnArchivo(trabajos);
     }
 
+    /**
+     * Finaliza un trabajo ya asignado, solicitando la fecha de finalización.
+     * Además, libera la máquina que estaba asignada al trabajo.
+     *
+     * @see Trabajo#finalizarTrabajo(LocalDate)
+     */
     private static void finalizarTrabajo() {
         // Solicitar al usuario el ID del trabajo que desea finalizar
         int idTrabajo = leerEntero("Ingrese el ID del trabajo a finalizar: ");
@@ -122,7 +148,7 @@ public class MenuTrabajos {
             if (trabajo.getId() == idTrabajo) {
                 trabajoEncontrado = true;
 
-                Date fechaFin = leerFecha("Ingrese la fecha de fin (formato: yyyy-MM-dd):");
+                LocalDate fechaFin = leerFecha("Ingrese la fecha de fin (formato: yyyy-MM-dd):");
 
                 // Validar y asignar la fecha de fin
                 if (fechaFin != null) {
@@ -141,11 +167,15 @@ public class MenuTrabajos {
             }
 
             // Guardar trabajos en el archivo después de modificar el estado
-            //guardarTrabajosEnArchivo();
+            guardarTrabajosEnArchivo(trabajos);
         }
-
     }
 
+    /**
+     * Muestra la lista de todos los trabajos registrados en el sistema,
+     * incluyendo su estado. Si no hay trabajos registrados, muestra un mensaje
+     * indicando que no existen trabajos.
+     */
     public static void listarTrabajos() {
         System.out.println("\n--- Trabajos ---");
         // Recorrer la lista de trabajos y mostrar su estado

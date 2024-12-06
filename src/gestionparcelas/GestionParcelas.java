@@ -2,7 +2,9 @@ package gestionparcelas;
 
 import ListasTemplates.*;
 import java.util.Scanner;
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import static gestionparcelas.GestionFicheros.*;
 
 /**
@@ -22,6 +24,7 @@ public class GestionParcelas {
     public static Lista<Maquina> maquinas = new Lista<>();
     public static Lista<Parcela> parcelas = new Lista<>();
     public static Lista<Trabajo> trabajos = new Lista<>();
+    public static Cola<Maquina> maquinasLibres = new Cola<>();
 
     private static final Scanner scanner = new Scanner(System.in);
 
@@ -117,32 +120,21 @@ public class GestionParcelas {
      *
      * @param mensaje El mensaje que se mostrará al usuario para solicitar la
      * fecha.
-     * @return La fecha ingresada por el usuario como un objeto Date.
+     * @return La fecha ingresada por el usuario como un objeto LocalDate.
      */
-    public static Date leerFecha(String mensaje) {
-        Date fecha = null;
+    public static LocalDate leerFecha(String mensaje) {
+        LocalDate fecha = null;
+        Scanner scanner = new Scanner(System.in);
 
         while (fecha == null) {
             System.out.print(mensaje);
             String entrada = scanner.nextLine();
 
             try {
-                // Dividir la entrada por "-"
-                String[] partes = entrada.split("-");
-                if (partes.length == 3) {
-                    int anno = Integer.parseInt(partes[0]) - 1900; // Date usa el año desde 1900
-                    int mes = Integer.parseInt(partes[1]) - 1; // Los meses van de 0 a 11
-                    int dia = Integer.parseInt(partes[2]);
-
-                    // Crear la fecha
-                    fecha = new Date(anno, mes, dia);
-                } else {
-                    System.out.println("Formato incorrecto. Use el formato yyyy-MM-dd.");
-                }
-            } catch (NumberFormatException e) {
-                System.out.println("Formato incorrecto. Asegúrese de usar números válidos para año, mes y día.");
-            } catch (IllegalArgumentException e) {
-                System.out.println("Fecha inválida. Por favor, intente de nuevo.");
+                // Intentar parsear la entrada al formato LocalDate
+                fecha = LocalDate.parse(entrada, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+            } catch (DateTimeParseException e) {
+                System.out.println("Formato incorrecto. Use el formato yyyy-MM-dd.");
             }
         }
 

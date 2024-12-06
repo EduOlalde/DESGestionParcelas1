@@ -1,23 +1,36 @@
 package gestionparcelas;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 /**
+ * Clase que representa un trabajo agrícola. Contiene información sobre la
+ * parcela, la máquina utilizada, el tipo de trabajo realizado, y las fechas de
+ * inicio y fin. Permite gestionar y asignar los diferentes aspectos
+ * relacionados con un trabajo.
  *
  * @author Eduardo Olalde
  */
 public class Trabajo {
 
     // Atributos
-    private final int id;
-    private Parcela parcela;
-    private Maquina maquina;
-    private String tipo; // "arar", "sembrar", "cosechar", "fumigar", etc.
-    private Date fechaInicio;
-    private Date fechaFin;
+    private final int id;         // Identificador único del trabajo
+    private Parcela parcela;      // Parcela asignada al trabajo
+    private Maquina maquina;      // Máquina asignada al trabajo
+    private String tipo;          // Tipo de trabajo (e.g., "arar", "sembrar", "cosechar", "fumigar")
+    private LocalDate fechaInicio;     // Fecha de inicio del trabajo
+    private LocalDate fechaFin;        // Fecha de finalización del trabajo
 
-    // Constructor
-    public Trabajo(int id, Parcela parcela, Maquina maquina, String tipo, Date fechaInicio, Date fechaFin) {
+    /**
+     * Constructor que inicializa un trabajo con los valores proporcionados.
+     *
+     * @param id El identificador único del trabajo.
+     * @param parcela La parcela donde se realiza el trabajo.
+     * @param maquina La máquina asignada al trabajo.
+     * @param tipo El tipo de trabajo a realizar.
+     * @param fechaInicio La fecha de inicio del trabajo.
+     * @param fechaFin La fecha de finalización del trabajo.
+     */
+    public Trabajo(int id, Parcela parcela, Maquina maquina, String tipo, LocalDate fechaInicio, LocalDate fechaFin) {
         this.id = id;
         this.parcela = parcela;
         this.maquina = maquina;
@@ -27,58 +40,120 @@ public class Trabajo {
     }
 
     // Getters y setters
+    /**
+     * Obtiene el identificador único del trabajo.
+     *
+     * @return El identificador del trabajo.
+     */
     public int getId() {
         return id;
     }
 
+    /**
+     * Obtiene la parcela asignada al trabajo.
+     *
+     * @return La parcela del trabajo.
+     */
     public Parcela getParcela() {
         return parcela;
     }
 
+    /**
+     * Asigna una nueva parcela al trabajo.
+     *
+     * @param parcela La nueva parcela a asignar.
+     */
     public void setParcela(Parcela parcela) {
         this.parcela = parcela;
     }
 
+    /**
+     * Obtiene la máquina asignada al trabajo.
+     *
+     * @return La máquina del trabajo.
+     */
     public Maquina getMaquina() {
         return maquina;
     }
 
+    /**
+     * Obtiene el tipo de trabajo realizado.
+     *
+     * @return El tipo de trabajo.
+     */
     public String getTipo() {
         return tipo;
     }
 
+    /**
+     * Establece un nuevo tipo de trabajo.
+     *
+     * @param tipo El nuevo tipo de trabajo.
+     */
     public void setTipo(String tipo) {
         this.tipo = tipo;
     }
 
-    public Date getFechaInicio() {
+    /**
+     * Obtiene la fecha de inicio del trabajo.
+     *
+     * @return La fecha de inicio.
+     */
+    public LocalDate getFechaInicio() {
         return fechaInicio;
     }
 
-    public void setFechaInicio(Date fechaInicio) {
+    /**
+     * Establece una nueva fecha de inicio para el trabajo.
+     *
+     * @param fechaInicio La nueva fecha de inicio.
+     */
+    public void setFechaInicio(LocalDate fechaInicio) {
         this.fechaInicio = fechaInicio;
     }
 
-    public Date getFechaFin() {
+    /**
+     * Obtiene la fecha de finalización del trabajo.
+     *
+     * @return La fecha de finalización.
+     */
+    public LocalDate getFechaFin() {
         return fechaFin;
     }
 
-    public void setFechaFin(Date fechaFin) {
+    /**
+     * Establece una nueva fecha de finalización para el trabajo.
+     *
+     * @param fechaFin La nueva fecha de finalización.
+     */
+    public void setFechaFin(LocalDate fechaFin) {
         this.fechaFin = fechaFin;
     }
 
-    // Métodos
+    // Métodos adicionales
+    /**
+     * Asigna una nueva máquina al trabajo.
+     *
+     * @param maquina La nueva máquina a asignar.
+     */
     public void asignarMaquina(Maquina maquina) {
         this.maquina = maquina;
     }
 
+    /**
+     * Devuelve una representación en forma de cadena del trabajo, incluyendo
+     * información sobre la parcela, la máquina, el tipo de trabajo, y las
+     * fechas.
+     *
+     * @return Una cadena que representa al trabajo.
+     */
     @Override
     public String toString() {
-        return "ID de Trabajo: " + id + "\n"
-                + "Parcela: " + (parcela != null ? parcela.getId() : "No asignada") + "\n"
-                + "Maquina: " + (maquina != null ? maquina.getId() : "No asignada") + "\n"
-                + "Tipo de trabajo: " + tipo + "\n"
-                + "Fecha de Inicio: " + fechaInicio + "\n"
-                + "Fecha de Fin: " + fechaFin;
+        return "ID de Trabajo: " + id
+                + "\tParcela: " + (parcela != null ? parcela.getId() : "No asignada")
+                + "\tMáquina: " + (maquina != null ? maquina.getId() : "No asignada")
+                + "\tTipo de trabajo: " + tipo
+                + "\tFecha de Inicio: " + (fechaInicio != null ? fechaInicio.toString() : "No asignada")
+                + "\tFecha de Fin: " + (fechaFin != null ? fechaFin.toString() : "No asignada");
     }
 }
