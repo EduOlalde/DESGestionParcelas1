@@ -1,7 +1,7 @@
 package gestionparcelas;
 
 import ListasTemplates.*;
-import static gestionparcelas.GestionParcelas.guardarAgricultoresEnArchivo;
+import static gestionparcelas.GestionFicheros.guardarAgricultoresEnArchivo;
 import static gestionparcelas.GestionParcelas.leerCadena;
 import static gestionparcelas.GestionParcelas.leerEntero;
 import static gestionparcelas.GestionParcelas.agricultores;
@@ -55,7 +55,7 @@ public class MenuAgricultores {
         Agricultor agricultor = new Agricultor(nuevoId, nombre, password);
 
         agricultores.add(agricultor);
-        guardarAgricultoresEnArchivo();
+        guardarAgricultoresEnArchivo(agricultores);
         System.out.println("Agricultor añadido correctamente con ID: " + nuevoId);
 
     }
@@ -66,7 +66,7 @@ public class MenuAgricultores {
         Agricultor temp = new Agricultor(id, "", "");
 
         if (agricultores.borrarElemento(temp)) {
-            guardarAgricultoresEnArchivo();
+            guardarAgricultoresEnArchivo(agricultores);
             System.out.println("Agricultor eliminada correctamente.");
         } else {
             System.out.println("Agricultor no encontrada.");
@@ -83,7 +83,7 @@ public class MenuAgricultores {
                 agricultor.setNombre(leerCadena("Nuevo nombre: "));
                 agricultor.setPassword(leerCadena("Nueva password: "));
                 System.out.println("Agricultor modificado correctamente.");
-                guardarAgricultoresEnArchivo();
+                guardarAgricultoresEnArchivo(agricultores);
                 return;
             }
             nodo = nodo.getSig();
@@ -93,7 +93,7 @@ public class MenuAgricultores {
     }
 
     public static void listarAgricultores() {
-        System.out.println("\n--- Listado de Agricultores ---");
+        System.out.println("\n--- Agricultores ---");
         Nodo<Agricultor> nodo = agricultores.getNodoInicial();
         if (nodo == null) {
             System.out.println("No hay agricultores registrados.");

@@ -1,7 +1,7 @@
 package gestionparcelas;
 
 import ListasTemplates.*;
-import static gestionparcelas.GestionParcelas.guardarTrabajosEnArchivo;
+import static gestionparcelas.GestionFicheros.guardarTrabajosEnArchivo;
 import static gestionparcelas.GestionParcelas.leerCadena;
 import static gestionparcelas.GestionParcelas.leerEntero;
 import static gestionparcelas.GestionParcelas.leerFecha;
@@ -10,6 +10,7 @@ import static gestionparcelas.GestionParcelas.parcelas;
 import static gestionparcelas.GestionParcelas.trabajos;
 import static gestionparcelas.MenuMaquinas.buscarMaquinaPorId;
 import static gestionparcelas.MenuParcelas.buscarParcelaPorId;
+import gestionparcelas.Maquina.Estado;
 import java.util.Date;
 
 /**
@@ -44,6 +45,9 @@ public class MenuTrabajos {
     }
 
     private static void asignarTrabajo() {
+        //Comprueba si hay máquinas libres o no permite la asignación
+        if(!MenuMaquinas.listarMaquinasLibres()) return;
+        
         // Mostrar las parcelas disponibles
         System.out.println("Seleccione una parcela:");
         Nodo<Parcela> nodoParcela = parcelas.getNodoInicial();
@@ -62,12 +66,8 @@ public class MenuTrabajos {
 
         // Mostrar las máquinas disponibles
         System.out.println("Seleccione una máquina:");
-        Nodo<Maquina> nodoMaquina = maquinas.getNodoInicial();
-        while (nodoMaquina != null) {
-            Maquina maquina = nodoMaquina.getInf();
-            System.out.println(maquina.getId() + ". " + maquina.getModelo());
-            nodoMaquina = nodoMaquina.getSig();
-        }
+        MenuMaquinas.listarMaquinasLibres();
+        
         int maquinaId = leerEntero("Ingrese el ID de la máquina: ");
         Maquina maquinaSeleccionada = buscarMaquinaPorId(maquinaId);
 
@@ -75,19 +75,15 @@ public class MenuTrabajos {
             System.out.println("Máquina no encontrada. Inténtelo de nuevo.");
             return;
         }
+        else{
+            maquinaSeleccionada.setEstado(Estado.asignada);
+        }
 
         // Solicitar el tipo de trabajo
         String tipoTrabajo = leerCadena("Ingrese el tipo de trabajo (ej. 'arar', 'sembrar', etc.): ");
 
         // Solicitar fecha de inicio
         Date fechaInicio = leerFecha("Ingrese la fecha de inicio (formato: yyyy-MM-dd): ");
-
-        // Solicitar fecha de finalización opcional
-        String respuesta = leerCadena("¿Desea ingresar una fecha de finalización? (s/n): ");
-        Date fechaFin = null;
-        if (respuesta.equalsIgnoreCase("s")) {
-            fechaFin = leerFecha("Ingrese la fecha de finalización (formato: yyyy-MM-dd): ");
-        }
 
         // Calcular el ID del nuevo trabajo (basado en la cantidad actual de trabajos)
         int idTrabajo = 1;
@@ -98,7 +94,7 @@ public class MenuTrabajos {
         }
 
         // Crear el objeto Trabajo con el constructor actualizado
-        Trabajo trabajo = new Trabajo(idTrabajo, parcelaSeleccionada, maquinaSeleccionada, tipoTrabajo, fechaInicio, fechaFin);
+        Trabajo trabajo = new Trabajo(idTrabajo, parcelaSeleccionada, maquinaSeleccionada, tipoTrabajo, fechaInicio, null);
 
         // Agregar el trabajo a la lista
         trabajos.add(trabajo);
@@ -108,7 +104,7 @@ public class MenuTrabajos {
         System.out.println(trabajo.toString());
 
         // Guardar trabajos en el archivo
-        guardarTrabajosEnArchivo();
+        //guardarTrabajosEnArchivo();
     }
 
     private static void finalizarTrabajo() {
@@ -131,6 +127,7 @@ public class MenuTrabajos {
                 // Validar y asignar la fecha de fin
                 if (fechaFin != null) {
                     trabajo.setFechaFin(fechaFin); // Asignar la fecha de fin al trabajo
+                    trabajo.getMaquina().setEstado(Estado.libre); // Libera la máquina usada
                     System.out.println("Trabajo finalizado con éxito.");
                 } else {
                     System.out.println("Fecha de fin no válida.");
@@ -144,12 +141,13 @@ public class MenuTrabajos {
             }
 
             // Guardar trabajos en el archivo después de modificar el estado
-            guardarTrabajosEnArchivo();
+            //guardarTrabajosEnArchivo();
         }
 
     }
 
     public static void listarTrabajos() {
+        System.out.println("\n--- Trabajos ---");
         // Recorrer la lista de trabajos y mostrar su estado
         Nodo<Trabajo> nodoTrabajo = trabajos.getNodoInicial();
 

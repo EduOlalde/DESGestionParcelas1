@@ -1,10 +1,11 @@
 package gestionparcelas;
 
 import ListasTemplates.*;
-import static gestionparcelas.GestionParcelas.guardarMaquinasEnArchivo;
+import static gestionparcelas.GestionFicheros.guardarMaquinasEnArchivo;
 import static gestionparcelas.GestionParcelas.leerCadena;
 import static gestionparcelas.GestionParcelas.leerEntero;
 import static gestionparcelas.GestionParcelas.maquinas;
+import gestionparcelas.Maquina.Estado;
 
 /**
  *
@@ -57,12 +58,12 @@ public class MenuMaquinas {
         System.out.println("Alta de máquina:");
         String tipo = leerCadena("Tipo de máquina: ");
         String modelo = leerCadena("Modelo de máquina: ");
-        String estado = "libre"; // Asignar estado inicial como "libre"
+        Estado estado = Estado.libre; // Asignar estado inicial como "libre"
 
         Maquina nuevaMaquina = new Maquina(nuevoId, tipo, modelo, estado);
 
         maquinas.add(nuevaMaquina);
-        guardarMaquinasEnArchivo();
+        guardarMaquinasEnArchivo(maquinas);
 
         System.out.println("Máquina añadida correctamente con ID: " + nuevoId);
     }
@@ -70,10 +71,10 @@ public class MenuMaquinas {
     private static void bajaMaquina() {
         System.out.println("Baja de máquina:");
         int id = leerEntero("ID de la máquina a eliminar: ");
-        Maquina temp = new Maquina(id, "", "", "");
+        Maquina temp = new Maquina(id, "", "", Estado.libre);
 
         if (maquinas.borrarElemento(temp)) {
-            guardarMaquinasEnArchivo();
+            guardarMaquinasEnArchivo(maquinas);
             System.out.println("Máquina eliminada correctamente.");
         } else {
             System.out.println("Máquina no encontrada.");
@@ -89,9 +90,25 @@ public class MenuMaquinas {
             if (maquina.getId() == id) {
                 maquina.setTipo(leerCadena("Nuevo tipo: "));
                 maquina.setModelo(leerCadena("Nuevo modelo: "));
-                maquina.setEstado(leerCadena("Nuevo estado: "));
+                System.out.println("Estados disponibles: ");
+                for (Estado estado : Estado.values()) {
+                    System.out.println("- " + estado.name());
+                }
+
+                // Leer y validar el nuevo estado
+                while (true) {
+                    String estadoStr = leerCadena("Nuevo estado: ");
+                    try {
+                        Estado nuevoEstado = Estado.valueOf(estadoStr.toLowerCase());
+                        maquina.setEstado(nuevoEstado);
+                        break;
+                    } catch (IllegalArgumentException e) {
+                        System.out.println("Estado no válido. Intente nuevamente.");
+                    }
+                }
+
                 System.out.println("Máquina modificada correctamente.");
-                guardarMaquinasEnArchivo();
+                guardarMaquinasEnArchivo(maquinas);
                 return;
             }
             nodo = nodo.getSig();
@@ -100,15 +117,20 @@ public class MenuMaquinas {
     }
 
     public static void listarMaquinas() {
-        System.out.println("\nMáquinas:");
+        System.out.println("\n--- Máquinas ---");
         Nodo<Maquina> nodo = maquinas.getNodoInicial();
+        if (nodo == null) {
+            System.out.println("No hay máquinas registradas.");
+            return;
+        }
         while (nodo != null) {
-            System.out.println(nodo.getInf() + "\n");
+            System.out.println(nodo.getInf().toString());
             nodo = nodo.getSig();
         }
     }
 
-    private static void listarMaquinasLibres() {
+    public static boolean listarMaquinasLibres() {
+        boolean hayLibre = true;
         // Crear la cola de máquinas libres
         Cola<Maquina> maquinasLibres = new Cola<>();
 
@@ -116,7 +138,7 @@ public class MenuMaquinas {
         Nodo<Maquina> nodoMaquina = maquinas.getNodoInicial();
         while (nodoMaquina != null) {
             Maquina maquina = nodoMaquina.getInf();
-            if ("libre".equals(maquina.getEstado())) {
+            if (maquina.getEstado() == Estado.libre) {
                 maquinasLibres.encolar(maquina);
             }
             nodoMaquina = nodoMaquina.getSig();
@@ -127,13 +149,17 @@ public class MenuMaquinas {
         Nodo<Maquina> nodo = maquinasLibres.getNodoInicio();
         while (nodo != null) {
             Maquina maquina = nodo.getInf();
-            System.out.println(maquina.getId() + ". " + maquina.getModelo());
+            System.out.println("ID: " + maquina.getId() + ", tipo: "
+                    + maquina.getTipo() + ", modelo: " + maquina.getModelo()
+                    + "\n");
             nodo = nodo.getSig();
         }
 
         if (maquinasLibres.esVacia()) {
             System.out.println("No hay máquinas libres.");
+            hayLibre = false;
         }
+        return hayLibre;
     }
 
     public static Maquina buscarMaquinaPorId(int id) {

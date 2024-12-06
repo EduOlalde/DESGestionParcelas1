@@ -1,7 +1,7 @@
 package gestionparcelas;
 
 import ListasTemplates.*;
-import static gestionparcelas.GestionParcelas.guardarParcelasEnArchivo;
+import static gestionparcelas.GestionFicheros.guardarParcelasEnArchivo;
 import static gestionparcelas.GestionParcelas.leerCadena;
 import static gestionparcelas.GestionParcelas.leerEntero;
 import static gestionparcelas.GestionParcelas.leerReal;
@@ -61,7 +61,7 @@ public class MenuParcelas {
         Parcela parcela = new Parcela(nuevoId, agricultor, ubicacion, extension, cultivo);
 
         parcelas.add(parcela);
-        guardarParcelasEnArchivo();
+        guardarParcelasEnArchivo(parcelas);
         System.out.println("Parcela añadida correctamente.");
 
     }
@@ -72,7 +72,7 @@ public class MenuParcelas {
         Parcela temp = new Parcela(id, null, "", 0, "");
 
         if (parcelas.borrarElemento(temp)) {
-            guardarParcelasEnArchivo();
+            guardarParcelasEnArchivo(parcelas);
             System.out.println("Parcela eliminada correctamente.");
         } else {
             System.out.println("Parcela no encontrada.");
@@ -90,7 +90,7 @@ public class MenuParcelas {
                 parcela.setExtension(leerReal("Nueva extensión (en hectáreas): "));
                 parcela.setCultivo(leerCadena("Nuevo cultivo: "));
                 System.out.println("Parcela modificada correctamente.");
-                guardarParcelasEnArchivo();
+                guardarParcelasEnArchivo(parcelas);
                 return;
             }
             nodo = nodo.getSig();
@@ -99,8 +99,12 @@ public class MenuParcelas {
     }
 
     public static void listarParcelas() {
-        System.out.println("\nParcelas:");
+        System.out.println("\n--- Parcelas ---");
         Nodo<Parcela> nodo = parcelas.getNodoInicial();
+        if (nodo == null) {
+            System.out.println("No hay trabajos registrados.");
+            return;
+        }
         while (nodo != null) {
             System.out.println(nodo.getInf().toString() + "\n");
             nodo = nodo.getSig();

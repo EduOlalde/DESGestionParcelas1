@@ -5,14 +5,17 @@ package gestionparcelas;
  * @author Eduardo Olalde
  */
 public class Maquina {
+    
+    public enum Estado {libre, asignada, mantenimiento}
+    
 
     private final int id;
     private String tipo;
     private String modelo;
-    private String estado;
+    private Estado estado;
 
     // Constructor
-    public Maquina(int id, String tipo, String modelo, String estado) {
+    public Maquina(int id, String tipo, String modelo, Estado estado) {
         this.id = id;
         this.tipo = tipo;
         this.modelo = modelo;
@@ -32,7 +35,7 @@ public class Maquina {
         return modelo;
     }
 
-    public String getEstado() {
+    public Estado getEstado() {
         return estado;
     }
 
@@ -45,7 +48,7 @@ public class Maquina {
         this.modelo = modelo;
     }
 
-    public void setEstado(String estado) {
+    public void setEstado(Estado estado) {
         this.estado = estado;
     }
 
@@ -53,16 +56,16 @@ public class Maquina {
     public void asignarTrabajo(Trabajo trabajo) {
         // Aquí puedes añadir la lógica para asignar el trabajo a la máquina
         // Por ejemplo, puedes cambiar el estado de la máquina a "en uso"
-        this.estado = "en uso";
+        this.estado = Estado.asignada;
         System.out.println(this.tipo + " " + this.modelo + " asignada al trabajo " + trabajo.getId());
     }
 
     @Override
     public String toString() {
-        return "ID de Máquina: " + id + "\n"
-                + "Tipo: " + tipo + "\n"
-                + "Modelo: " + modelo + "\n"
-                + "Estado: " + estado;
+        return "ID de Máquina: " + id  
+                + ", tipo: " + tipo  
+                + ", modelo: " + modelo  
+                + ", estado: " + estado;
     }
 
 }
