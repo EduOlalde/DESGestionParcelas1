@@ -18,9 +18,17 @@ public class Maquina {
         mantenimiento  // La máquina está en mantenimiento y no está disponible.
     }
 
+    // Enumeración para los tipos de máquinas disponibles
+    public enum TipoTrabajo {
+        arar, // Tipo de máquina "arado"
+        cosechar, // Tipo de máquina "cosechadora"
+        sembrar, // Tipo de máquina "sembradora"
+        fumigar   // Tipo de máquina "fumigadora"
+    }
+
     // Atributos
     private final int id;      // Identificador único de la máquina.
-    private String tipo;       // Tipo de máquina (e.g., "tractor", "cosechadora").
+    private TipoTrabajo tipoTrabajo;         // Tipo de máquina (e.g., "arado", "cosechadora").
     private String modelo;     // Modelo de la máquina.
     private Estado estado;     // Estado actual de la máquina.
 
@@ -28,13 +36,13 @@ public class Maquina {
      * Constructor para inicializar una máquina con los valores proporcionados.
      *
      * @param id El identificador único de la máquina.
-     * @param tipo El tipo de la máquina.
+     * @param tipo El tipoTrabajo de la máquina.
      * @param modelo El modelo de la máquina.
      * @param estado El estado inicial de la máquina.
      */
-    public Maquina(int id, String tipo, String modelo, Estado estado) {
+    public Maquina(int id, TipoTrabajo tipo, String modelo, Estado estado) {
         this.id = id;
-        this.tipo = tipo;
+        this.tipoTrabajo = tipo;
         this.modelo = modelo;
         this.estado = estado;
     }
@@ -50,12 +58,12 @@ public class Maquina {
     }
 
     /**
-     * Obtiene el tipo de la máquina.
+     * Obtiene el tipoTrabajo de la máquina.
      *
-     * @return El tipo de la máquina.
+     * @return El tipoTrabajo de la máquina.
      */
-    public String getTipo() {
-        return tipo;
+    public TipoTrabajo getTipoTrabajo() {
+        return tipoTrabajo;
     }
 
     /**
@@ -78,12 +86,12 @@ public class Maquina {
 
     // Métodos Setters
     /**
-     * Establece un nuevo tipo para la máquina.
+     * Establece un nuevo tipoTrabajo para la máquina.
      *
-     * @param tipo El nuevo tipo de la máquina.
+     * @param tipoTrabajo El nuevo tipoTrabajo de la máquina.
      */
-    public void setTipo(String tipo) {
-        this.tipo = tipo;
+    public void setTipoTrabajo(TipoTrabajo tipoTrabajo) {
+        this.tipoTrabajo = tipoTrabajo;
     }
 
     /**
@@ -115,19 +123,19 @@ public class Maquina {
     public void asignarTrabajo(Trabajo trabajo) {
         // Cambia el estado de la máquina a "asignada".
         this.estado = Estado.asignada;
-        System.out.println(this.tipo + " " + this.modelo + " asignada al trabajo " + trabajo.getId());
+        System.out.println(this.tipoTrabajo + " " + this.modelo + " asignada al trabajo " + trabajo.getId());
     }
 
     /**
      * Devuelve una representación en forma de cadena de la máquina, incluyendo
-     * su ID, tipo, modelo y estado actual.
+ su ID, tipoTrabajo, modelo y estado actual.
      *
      * @return Una cadena que representa la máquina.
      */
     @Override
     public String toString() {
         return "ID de Máquina: " + id
-                + "\tTipo: " + tipo
+                + "\tTipo: " + tipoTrabajo
                 + "\tModelo: " + modelo
                 + "\tEstado: " + estado;
     }

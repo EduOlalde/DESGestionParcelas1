@@ -3,8 +3,8 @@ package gestionparcelas;
 import ListasTemplates.*;
 import java.io.*;
 import java.time.LocalDate;
-import java.text.ParseException;
 import java.time.format.DateTimeFormatter;
+import gestionparcelas.Maquina.Estado;
 
 /**
  * Clase encargada de gestionar la lectura y escritura de datos de agricultores,
@@ -84,10 +84,10 @@ public class GestionFicheros {
 
             while (iterador.hayElemento()) {
                 Maquina maquina = iterador.dameValor();
-                // Guardar ID, tipo, modelo y estado (convertido a texto)
+                // Guardar ID, tipo (como nombre del enum), modelo y estado (convertido a texto)
                 writer.println(
                         maquina.getId() + ","
-                        + maquina.getTipo() + ","
+                        + maquina.getTipoTrabajo().name() + "," // Guardamos el nombre del tipo (enum)
                         + maquina.getModelo() + ","
                         + maquina.getEstado().name() // Convertir enum Estado a String
                 );
@@ -114,16 +114,22 @@ public class GestionFicheros {
                 String[] datos = linea.split(",");
                 if (datos.length == 4) {  // Esperamos 4 datos: id, tipo, modelo, estado
                     int id = Integer.parseInt(datos[0]);  // Convertir ID a número
-                    String tipo = datos[1];
+                    String tipoStr = datos[1];  // Tipo como String desde el archivo
                     String modelo = datos[2];
 
-                    // Convertir el estado a un valor del enum Estado
+                    // Convertir el tipo a un valor del enum Tipo
                     try {
-                        Maquina.Estado estado = Maquina.Estado.valueOf(datos[3].toLowerCase());
-                        Maquina maquina = new Maquina(id, tipo, modelo, estado);
-                        maquinas.add(maquina); // Agregar la máquina a la lista
+                        Maquina.TipoTrabajo tipo = Maquina.TipoTrabajo.valueOf(tipoStr.toLowerCase());  // Convertir a enum Tipo
+                        // Convertir el estado a un valor del enum Estado
+                        try {
+                            Estado estado = Estado.valueOf(datos[3].toLowerCase());  // Convertir estado
+                            Maquina maquina = new Maquina(id, tipo, modelo, estado);
+                            maquinas.add(maquina); // Agregar la máquina a la lista
+                        } catch (IllegalArgumentException e) {
+                            System.out.println("Estado inválido en el archivo para la máquina con ID " + id + ". Se omitirá esta entrada.");
+                        }
                     } catch (IllegalArgumentException e) {
-                        System.out.println("Estado inválido en el archivo para la máquina con ID " + id + ". Se omitirá esta entrada.");
+                        System.out.println("Tipo inválido en el archivo para la máquina con ID " + id + ". Se omitirá esta entrada.");
                     }
                 }
             }
@@ -225,7 +231,7 @@ public class GestionFicheros {
                         trabajo.getId() + ","
                         + trabajo.getParcela().getId() + ","
                         + trabajo.getMaquina().getId() + ","
-                        + trabajo.getTipo().name() + "," // Usamos name() para obtener el valor del enum
+                        + trabajo.getTipoTrabajo().name() + "," // Usamos name() para obtener el valor del enum
                         + fechaInicioStr + ","
                         + fechaFinStr
                 );
@@ -279,11 +285,11 @@ public class GestionFicheros {
 
                     try {
                         if (!fechaInicioStr.isEmpty()) {
-                            fechaInicio = LocalDate.parse(fechaInicioStr, dateFormat); 
+                            fechaInicio = LocalDate.parse(fechaInicioStr, dateFormat);
                         }
                         // Solo convertimos fechaFin si no está vacía
                         if (!fechaFinStr.isEmpty()) {
-                            fechaFin = LocalDate.parse(fechaFinStr, dateFormat); 
+                            fechaFin = LocalDate.parse(fechaFinStr, dateFormat);
                         }
                     } catch (Exception e) {
                         System.out.println("Formato de fecha inválido para el trabajo con ID: " + id);
@@ -296,16 +302,16 @@ public class GestionFicheros {
 
                     if (parcela != null && maquina != null) {
                         // Convertimos el tipo de trabajo de String a tipoAtrabajo (enum)
-                        Trabajo.tipoAtrabajo tipoTrabajo = null;
+                        Maquina.TipoTrabajo tipoTrabajo = null;
                         try {
-                            tipoTrabajo = Trabajo.tipoAtrabajo.valueOf(tipoStr); // Convertimos la cadena al enum
+                            tipoTrabajo = Maquina.TipoTrabajo.valueOf(tipoStr); // Convertimos la cadena al enum
                         } catch (IllegalArgumentException e) {
                             System.out.println("Tipo de trabajo inválido para el trabajo con ID: " + id);
                             continue; // Pasamos al siguiente trabajo si el tipo no es válido
                         }
 
                         Trabajo trabajo = new Trabajo(id, parcela, maquina, tipoTrabajo, fechaInicio, fechaFin);
-                        trabajos.add(trabajo); 
+                        trabajos.add(trabajo);
                     } else {
                         System.out.println("No se encontró la parcela o la máquina para el trabajo con ID: " + id);
                     }

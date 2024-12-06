@@ -1,6 +1,7 @@
 package gestionparcelas;
 
 import java.time.LocalDate;
+import gestionparcelas.Maquina.TipoTrabajo;
 
 /**
  * Clase que representa un trabajo agrícola. Contiene información sobre la
@@ -12,19 +13,11 @@ import java.time.LocalDate;
  */
 public class Trabajo {
 
-    // Enum para los tipos de trabajo
-    public enum tipoAtrabajo {
-        arar,
-        sembrar,
-        cosechar,
-        fumigar
-    }
-
     // Atributos
     private final int id;          // Identificador único del trabajo
     private Parcela parcela;       // Parcela asignada al trabajo
     private Maquina maquina;       // Máquina asignada al trabajo
-    private tipoAtrabajo tipoTrabajo; // Tipo de trabajo (enum)
+    private TipoTrabajo tipoTrabajo; // Tipo de trabajo (enum)
     private LocalDate fechaInicio; // Fecha de inicio del trabajo
     private LocalDate fechaFin;    // Fecha de finalización del trabajo
 
@@ -38,7 +31,7 @@ public class Trabajo {
      * @param fechaInicio La fecha de inicio del trabajo.
      * @param fechaFin La fecha de finalización del trabajo.
      */
-    public Trabajo(int id, Parcela parcela, Maquina maquina, tipoAtrabajo tipo, LocalDate fechaInicio, LocalDate fechaFin) {
+    public Trabajo(int id, Parcela parcela, Maquina maquina, TipoTrabajo tipo, LocalDate fechaInicio, LocalDate fechaFin) {
         this.id = id;
         this.parcela = parcela;
         this.maquina = maquina;
@@ -89,7 +82,7 @@ public class Trabajo {
      *
      * @return El tipo de trabajo.
      */
-    public tipoAtrabajo getTipo() {
+    public TipoTrabajo getTipoTrabajo() {
         return tipoTrabajo;
     }
 
@@ -98,7 +91,7 @@ public class Trabajo {
      *
      * @param tipo El nuevo tipo de trabajo.
      */
-    public void setTipo(tipoAtrabajo tipo) {
+    public void setTipoTrabajo(TipoTrabajo tipo) {
         this.tipoTrabajo = tipo;
     }
 

@@ -6,6 +6,7 @@ import static gestionparcelas.GestionParcelas.leerCadena;
 import static gestionparcelas.GestionParcelas.leerEntero;
 import static gestionparcelas.GestionParcelas.maquinas;
 import gestionparcelas.Maquina.Estado;
+import gestionparcelas.Maquina.TipoTrabajo;
 
 /**
  * Clase que gestiona el menú de operaciones relacionadas con las máquinas.
@@ -74,7 +75,22 @@ public class MenuMaquinas {
         }
 
         System.out.println("Alta de máquina:");
-        String tipo = leerCadena("Tipo de máquina: ");
+        System.out.println("Tipos de máquinas disponibles:");
+        for (TipoTrabajo tipo : TipoTrabajo.values()) {
+            System.out.println("- " + tipo.name());
+        }
+
+        // Leer y validar el tipo
+        TipoTrabajo tipo = null;
+        while (tipo == null) {
+            String tipoStr = leerCadena("Tipo de máquina: ").toLowerCase();
+            try {
+                tipo = TipoTrabajo.valueOf(tipoStr);
+            } catch (IllegalArgumentException e) {
+                System.out.println("Tipo no válido. Intente nuevamente.");
+            }
+        }
+
         String modelo = leerCadena("Modelo de máquina: ");
         Estado estado = Estado.libre; // Asignar estado inicial como "libre"
 
@@ -94,7 +110,7 @@ public class MenuMaquinas {
     private static void bajaMaquina() {
         System.out.println("Baja de máquina:");
         int id = leerEntero("ID de la máquina a eliminar: ");
-        Maquina temp = new Maquina(id, "", "", Estado.libre);
+        Maquina temp = new Maquina(id, TipoTrabajo.arar, "", Estado.libre); // Tipo genérico para búsqueda
 
         if (maquinas.borrarElemento(temp)) {
             guardarMaquinasEnArchivo(maquinas);
@@ -117,7 +133,23 @@ public class MenuMaquinas {
         while (iter.hayElemento()) {
             Maquina maquina = iter.dameValor();
             if (maquina.getId() == id) {
-                maquina.setTipo(leerCadena("Nuevo tipo: "));
+                System.out.println("Tipos de máquinas disponibles:");
+                for (TipoTrabajo tipo : TipoTrabajo.values()) {
+                    System.out.println("- " + tipo.name());
+                }
+
+                // Leer y validar el nuevo tipo
+                TipoTrabajo tipo = null;
+                while (tipo == null) {
+                    String tipoStr = leerCadena("Nuevo tipo: ").toLowerCase();
+                    try {
+                        tipo = TipoTrabajo.valueOf(tipoStr);
+                    } catch (IllegalArgumentException e) {
+                        System.out.println("Tipo no válido. Intente nuevamente.");
+                    }
+                }
+
+                maquina.setTipoTrabajo(tipo);
                 maquina.setModelo(leerCadena("Nuevo modelo: "));
                 System.out.println("Estados disponibles: ");
                 for (Estado estado : Estado.values()) {
@@ -190,7 +222,7 @@ public class MenuMaquinas {
         while (nodo != null) {
             Maquina maquina = nodo.getInf();
             System.out.println("ID: " + maquina.getId() + ", tipo: "
-                    + maquina.getTipo() + ", modelo: " + maquina.getModelo());
+                    + maquina.getTipoTrabajo() + ", modelo: " + maquina.getModelo());
             nodo = nodo.getSig();
         }
 

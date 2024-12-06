@@ -8,9 +8,9 @@ import static gestionparcelas.GestionParcelas.leerFecha;
 import static gestionparcelas.GestionParcelas.parcelas;
 import static gestionparcelas.GestionParcelas.trabajos;
 import static gestionparcelas.GestionParcelas.maquinas;
-import static gestionparcelas.MenuMaquinas.buscarMaquinaPorId;
 import static gestionparcelas.MenuParcelas.buscarParcelaPorId;
 import gestionparcelas.Maquina.Estado;
+import gestionparcelas.Maquina.TipoTrabajo;
 import java.time.LocalDate;
 
 /**
@@ -59,10 +59,32 @@ public class MenuTrabajos {
     }
 
     /**
-     * Asigna un trabajo a una máquina y una parcela. Solicita al usuario los
-     * datos necesarios como el tipo de trabajo, la parcela y la máquina, y
-     * guarda la información del trabajo. Además, verifica que haya máquinas
-     * libres para realizar la asignación.
+     * Asigna un trabajo a una máquina disponible. El trabajo se asigna en
+     * función del tipo de trabajo seleccionado y de las máquinas libres
+     * disponibles que coincidan con ese tipo. Si hay máquinas disponibles para
+     * el tipo de trabajo seleccionado, se asigna la primera máquina de la cola
+     * correspondiente.
+     *
+     * Luego de asignar la máquina, se procede a asociarla con una parcela
+     * seleccionada, se establece la fecha de inicio del trabajo y se guarda la
+     * información en los archivos correspondientes.
+     *
+     * El proceso se realiza en los siguientes pasos:
+     * <ul>
+     * <li>Se verifica si existen máquinas libres.</li>
+     * <li>El usuario selecciona el tipo de trabajo.</li>
+     * <li>Se crea una cola de máquinas disponibles para el tipo de
+     * trabajo.</li>
+     * <li>Se asigna la primera máquina disponible de la cola.</li>
+     * <li>El usuario selecciona una parcela.</li>
+     * <li>Se establece la fecha de inicio del trabajo.</li>
+     * <li>Se guarda el trabajo y la máquina en los archivos
+     * correspondientes.</li>
+     * </ul>
+     *
+     * @see Trabajo
+     * @see Maquina
+     * @see Parcela
      */
     private static void asignarTrabajo() {
         // Comprueba si hay máquinas libres o no permite la asignación
@@ -70,15 +92,46 @@ public class MenuTrabajos {
             return;
         }
 
-        int maquinaId = leerEntero("Ingrese el ID de la máquina: ");
-        Maquina maquinaSeleccionada = buscarMaquinaPorId(maquinaId);
-
-        if (maquinaSeleccionada == null) {
-            System.out.println("Máquina no encontrada. Inténtelo de nuevo.");
-            return;
-        } else {
-            maquinaSeleccionada.setEstado(Estado.asignada);
+        // Mostrar los tipos de trabajo disponibles
+        System.out.println("\nSeleccione el tipo de trabajo:");
+        for (TipoTrabajo tipo : TipoTrabajo.values()) {
+            System.out.println(tipo.ordinal() + 1 + ". " + tipo.name()); // Mostrar las opciones disponibles
         }
+
+        // Leer la opción del tipo de trabajo
+        int tipoTrabajoSeleccionado = leerEntero("Ingrese el número del tipo de trabajo: ");
+
+        // Validar que la opción esté en el rango de tipos disponibles
+        if (tipoTrabajoSeleccionado < 1 || tipoTrabajoSeleccionado > TipoTrabajo.values().length) {
+            System.out.println("Opción no válida. Inténtelo de nuevo.");
+            return;
+        }
+
+        // Convertir la selección en un valor del enum TipoTrabajo
+        TipoTrabajo tipoTrabajo = TipoTrabajo.values()[tipoTrabajoSeleccionado - 1];
+
+        // Crear una cola para las máquinas libres del tipo seleccionado
+        Cola<Maquina> colaMaquinasTipo = new Cola<>();
+
+        // Recorremos la lista de máquinas y agregamos a la cola aquellas que estén libres y coincidan con el tipo de trabajo
+        Iterador<Maquina> iteradorMaquinas = new Iterador<>(maquinas);
+        while (iteradorMaquinas.hayElemento()) {
+            Maquina maquina = iteradorMaquinas.dameValor();
+            if (maquina.getEstado() == Estado.libre && maquina.getTipoTrabajo() == tipoTrabajo) {
+                colaMaquinasTipo.encolar(maquina);
+            }
+            iteradorMaquinas.next();
+        }
+
+        // Si la cola está vacía, no hay máquinas disponibles para el tipo de trabajo
+        if (colaMaquinasTipo.esVacia()) {
+            System.out.println("No hay máquinas libres disponibles para el tipo de trabajo seleccionado.");
+            return;
+        }
+
+        // Obtener la primera máquina de la cola
+        Maquina maquinaSeleccionada = colaMaquinasTipo.desencolar();
+        maquinaSeleccionada.setEstado(Estado.asignada);
 
         // Mostrar las parcelas disponibles
         System.out.println("\nSeleccione una parcela:");
@@ -96,31 +149,13 @@ public class MenuTrabajos {
             return;
         }
 
-        // Mostrar los tipos de trabajo disponibles
-        System.out.println("\nSeleccione el tipo de trabajo:");
-        for (Trabajo.tipoAtrabajo tipo : Trabajo.tipoAtrabajo.values()) {
-            System.out.println(tipo.ordinal() + 1 + ". " + tipo.name()); // Mostrar las opciones disponibles
-        }
-
-        // Leer la opción del tipo de trabajo
-        int tipoTrabajoSeleccionado = leerEntero("Ingrese el número del tipo de trabajo: ");
-
-        // Validar que la opción esté en el rango de tipos disponibles
-        if (tipoTrabajoSeleccionado < 1 || tipoTrabajoSeleccionado > Trabajo.tipoAtrabajo.values().length) {
-            System.out.println("Opción no válida. Inténtelo de nuevo.");
-            return;
-        }
-
-        // Convertir la selección en un valor del enum
-        Trabajo.tipoAtrabajo tipoTrabajo = Trabajo.tipoAtrabajo.values()[tipoTrabajoSeleccionado - 1];
-
         // Solicitar fecha de inicio
         LocalDate fechaInicio = leerFecha("Ingrese la fecha de inicio (formato: yyyy-MM-dd): ");
 
         // Calcular el ID del nuevo trabajo (basado en la cantidad actual de trabajos)
         int idTrabajo = 1;
         Iterador<Trabajo> iteradorTrabajos = new Iterador<>(trabajos);
-        while (iteradorTrabajos.hasNext()) {
+        while (iteradorTrabajos.hayElemento()) {
             idTrabajo++;
             iteradorTrabajos.next();
         }
@@ -209,7 +244,7 @@ public class MenuTrabajos {
             String estado = (trabajo.getFechaFin() == null) ? "Asignado" : "Terminado";
             System.out.println("Trabajo ID: " + trabajo.getId()
                     + " | Parcela: " + trabajo.getParcela().getUbicacion()
-                    + " | Tipo: " + trabajo.getTipo()
+                    + " | Tipo: " + trabajo.getTipoTrabajo()
                     + " | Estado: " + estado);
             iteradorTrabajos.next();
         }
