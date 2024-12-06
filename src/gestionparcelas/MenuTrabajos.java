@@ -92,7 +92,7 @@ public class MenuTrabajos {
         Parcela parcelaSeleccionada = buscarParcelaPorId(parcelaId);
 
         if (parcelaSeleccionada == null) {
-            System.out.println("Parcela no encontrada. Inténtelo de nuevo.");
+            System.out.println("Parcela no encontrada.");
             return;
         }
 
