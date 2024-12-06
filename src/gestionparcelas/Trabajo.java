@@ -12,13 +12,21 @@ import java.time.LocalDate;
  */
 public class Trabajo {
 
+    // Enum para los tipos de trabajo
+    public enum tipoAtrabajo {
+        arar,
+        sembrar,
+        cosechar,
+        fumigar
+    }
+
     // Atributos
-    private final int id;         // Identificador único del trabajo
-    private Parcela parcela;      // Parcela asignada al trabajo
-    private Maquina maquina;      // Máquina asignada al trabajo
-    private String tipo;          // Tipo de trabajo (e.g., "arar", "sembrar", "cosechar", "fumigar")
-    private LocalDate fechaInicio;     // Fecha de inicio del trabajo
-    private LocalDate fechaFin;        // Fecha de finalización del trabajo
+    private final int id;          // Identificador único del trabajo
+    private Parcela parcela;       // Parcela asignada al trabajo
+    private Maquina maquina;       // Máquina asignada al trabajo
+    private tipoAtrabajo tipoTrabajo; // Tipo de trabajo (enum)
+    private LocalDate fechaInicio; // Fecha de inicio del trabajo
+    private LocalDate fechaFin;    // Fecha de finalización del trabajo
 
     /**
      * Constructor que inicializa un trabajo con los valores proporcionados.
@@ -30,11 +38,11 @@ public class Trabajo {
      * @param fechaInicio La fecha de inicio del trabajo.
      * @param fechaFin La fecha de finalización del trabajo.
      */
-    public Trabajo(int id, Parcela parcela, Maquina maquina, String tipo, LocalDate fechaInicio, LocalDate fechaFin) {
+    public Trabajo(int id, Parcela parcela, Maquina maquina, tipoAtrabajo tipo, LocalDate fechaInicio, LocalDate fechaFin) {
         this.id = id;
         this.parcela = parcela;
         this.maquina = maquina;
-        this.tipo = tipo;
+        this.tipoTrabajo = tipo;
         this.fechaInicio = fechaInicio;
         this.fechaFin = fechaFin;
     }
@@ -81,8 +89,8 @@ public class Trabajo {
      *
      * @return El tipo de trabajo.
      */
-    public String getTipo() {
-        return tipo;
+    public tipoAtrabajo getTipo() {
+        return tipoTrabajo;
     }
 
     /**
@@ -90,8 +98,8 @@ public class Trabajo {
      *
      * @param tipo El nuevo tipo de trabajo.
      */
-    public void setTipo(String tipo) {
-        this.tipo = tipo;
+    public void setTipo(tipoAtrabajo tipo) {
+        this.tipoTrabajo = tipo;
     }
 
     /**
@@ -152,7 +160,7 @@ public class Trabajo {
         return "ID de Trabajo: " + id
                 + "\tParcela: " + (parcela != null ? parcela.getId() : "No asignada")
                 + "\tMáquina: " + (maquina != null ? maquina.getId() : "No asignada")
-                + "\tTipo de trabajo: " + tipo
+                + "\tTipo de trabajo: " + (tipoTrabajo != null ? tipoTrabajo.name() : "No asignado")
                 + "\tFecha de Inicio: " + (fechaInicio != null ? fechaInicio.toString() : "No asignada")
                 + "\tFecha de Fin: " + (fechaFin != null ? fechaFin.toString() : "No asignada");
     }

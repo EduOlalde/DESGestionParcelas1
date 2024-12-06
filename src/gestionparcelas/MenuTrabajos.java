@@ -7,6 +7,7 @@ import static gestionparcelas.GestionParcelas.leerEntero;
 import static gestionparcelas.GestionParcelas.leerFecha;
 import static gestionparcelas.GestionParcelas.parcelas;
 import static gestionparcelas.GestionParcelas.trabajos;
+import static gestionparcelas.GestionParcelas.maquinas;
 import static gestionparcelas.MenuMaquinas.buscarMaquinaPorId;
 import static gestionparcelas.MenuParcelas.buscarParcelaPorId;
 import gestionparcelas.Maquina.Estado;
@@ -69,26 +70,6 @@ public class MenuTrabajos {
             return;
         }
 
-        // Mostrar las parcelas disponibles
-        System.out.println("Seleccione una parcela:");
-        Nodo<Parcela> nodoParcela = parcelas.getNodoInicial();
-        while (nodoParcela != null) {
-            Parcela parcela = nodoParcela.getInf();
-            System.out.println(parcela.getId() + ". " + parcela.getUbicacion());
-            nodoParcela = nodoParcela.getSig();
-        }
-        int parcelaId = leerEntero("Ingrese el ID de la parcela: ");
-        Parcela parcelaSeleccionada = buscarParcelaPorId(parcelaId);
-
-        if (parcelaSeleccionada == null) {
-            System.out.println("Parcela no encontrada. Inténtelo de nuevo.");
-            return;
-        }
-
-        // Mostrar las máquinas disponibles
-        System.out.println("Seleccione una máquina:");
-        MenuMaquinas.listarMaquinasLibres();
-
         int maquinaId = leerEntero("Ingrese el ID de la máquina: ");
         Maquina maquinaSeleccionada = buscarMaquinaPorId(maquinaId);
 
@@ -99,18 +80,49 @@ public class MenuTrabajos {
             maquinaSeleccionada.setEstado(Estado.asignada);
         }
 
-        // Solicitar el tipo de trabajo
-        String tipoTrabajo = leerCadena("Ingrese el tipo de trabajo (ej. 'arar', 'sembrar', etc.): ");
+        // Mostrar las parcelas disponibles
+        System.out.println("\nSeleccione una parcela:");
+        Iterador<Parcela> iteradorParcelas = new Iterador<>(parcelas);
+        while (iteradorParcelas.hasNext()) {
+            Parcela parcela = iteradorParcelas.dameValor();
+            System.out.println(parcela.getId() + ". " + parcela.getUbicacion());
+            iteradorParcelas.next();
+        }
+        int parcelaId = leerEntero("Ingrese el ID de la parcela: ");
+        Parcela parcelaSeleccionada = buscarParcelaPorId(parcelaId);
+
+        if (parcelaSeleccionada == null) {
+            System.out.println("Parcela no encontrada. Inténtelo de nuevo.");
+            return;
+        }
+
+        // Mostrar los tipos de trabajo disponibles
+        System.out.println("\nSeleccione el tipo de trabajo:");
+        for (Trabajo.tipoAtrabajo tipo : Trabajo.tipoAtrabajo.values()) {
+            System.out.println(tipo.ordinal() + 1 + ". " + tipo.name()); // Mostrar las opciones disponibles
+        }
+
+        // Leer la opción del tipo de trabajo
+        int tipoTrabajoSeleccionado = leerEntero("Ingrese el número del tipo de trabajo: ");
+
+        // Validar que la opción esté en el rango de tipos disponibles
+        if (tipoTrabajoSeleccionado < 1 || tipoTrabajoSeleccionado > Trabajo.tipoAtrabajo.values().length) {
+            System.out.println("Opción no válida. Inténtelo de nuevo.");
+            return;
+        }
+
+        // Convertir la selección en un valor del enum
+        Trabajo.tipoAtrabajo tipoTrabajo = Trabajo.tipoAtrabajo.values()[tipoTrabajoSeleccionado - 1];
 
         // Solicitar fecha de inicio
         LocalDate fechaInicio = leerFecha("Ingrese la fecha de inicio (formato: yyyy-MM-dd): ");
 
         // Calcular el ID del nuevo trabajo (basado en la cantidad actual de trabajos)
         int idTrabajo = 1;
-        Nodo<Trabajo> nodoTrabajo = trabajos.getNodoInicial();
-        while (nodoTrabajo != null) {
+        Iterador<Trabajo> iteradorTrabajos = new Iterador<>(trabajos);
+        while (iteradorTrabajos.hasNext()) {
             idTrabajo++;
-            nodoTrabajo = nodoTrabajo.getSig();
+            iteradorTrabajos.next();
         }
 
         // Crear el objeto Trabajo con el constructor actualizado
@@ -125,6 +137,7 @@ public class MenuTrabajos {
 
         // Guardar trabajos en el archivo
         guardarTrabajosEnArchivo(trabajos);
+        GestionFicheros.guardarMaquinasEnArchivo(maquinas);
     }
 
     /**
@@ -138,11 +151,11 @@ public class MenuTrabajos {
         int idTrabajo = leerEntero("Ingrese el ID del trabajo a finalizar: ");
 
         // Buscar el trabajo en la lista de trabajos
-        Nodo<Trabajo> nodoTrabajo = trabajos.getNodoInicial();
+        Iterador<Trabajo> iteradorTrabajos = new Iterador<>(trabajos);
         boolean trabajoEncontrado = false;
 
-        while (nodoTrabajo != null) {
-            Trabajo trabajo = nodoTrabajo.getInf();
+        while (iteradorTrabajos.hasNext()) {
+            Trabajo trabajo = iteradorTrabajos.dameValor();
 
             // Verificar si el trabajo tiene el ID proporcionado
             if (trabajo.getId() == idTrabajo) {
@@ -159,16 +172,19 @@ public class MenuTrabajos {
                     System.out.println("Fecha de fin no válida.");
                 }
 
-                nodoTrabajo = nodoTrabajo.getSig();
+                break;
             }
 
-            if (!trabajoEncontrado) {
-                System.out.println("Trabajo con ID " + idTrabajo + " no encontrado.");
-            }
-
-            // Guardar trabajos en el archivo después de modificar el estado
-            guardarTrabajosEnArchivo(trabajos);
+            iteradorTrabajos.next();
         }
+
+        if (!trabajoEncontrado) {
+            System.out.println("Trabajo con ID " + idTrabajo + " no encontrado.");
+        }
+
+        // Guardar trabajos en el archivo después de modificar el estado
+        guardarTrabajosEnArchivo(trabajos);
+        GestionFicheros.guardarMaquinasEnArchivo(maquinas);
     }
 
     /**
@@ -178,23 +194,24 @@ public class MenuTrabajos {
      */
     public static void listarTrabajos() {
         System.out.println("\n--- Trabajos ---");
-        // Recorrer la lista de trabajos y mostrar su estado
-        Nodo<Trabajo> nodoTrabajo = trabajos.getNodoInicial();
 
-        if (nodoTrabajo == null) {
+        // Recorrer la lista de trabajos y mostrar su estado usando iterador
+        Iterador<Trabajo> iteradorTrabajos = new Iterador<>(trabajos);
+
+        if (!iteradorTrabajos.hayElemento()) {
             System.out.println("No hay trabajos registrados.");
             return;
         }
 
         System.out.println("Lista de trabajos:");
-        while (nodoTrabajo != null) {
-            Trabajo trabajo = nodoTrabajo.getInf();
+        while (iteradorTrabajos.hasNext()) {
+            Trabajo trabajo = iteradorTrabajos.dameValor();
             String estado = (trabajo.getFechaFin() == null) ? "Asignado" : "Terminado";
             System.out.println("Trabajo ID: " + trabajo.getId()
                     + " | Parcela: " + trabajo.getParcela().getUbicacion()
                     + " | Tipo: " + trabajo.getTipo()
                     + " | Estado: " + estado);
-            nodoTrabajo = nodoTrabajo.getSig();
+            iteradorTrabajos.next();
         }
     }
 }

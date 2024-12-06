@@ -225,7 +225,7 @@ public class GestionFicheros {
                         trabajo.getId() + ","
                         + trabajo.getParcela().getId() + ","
                         + trabajo.getMaquina().getId() + ","
-                        + trabajo.getTipo() + ","
+                        + trabajo.getTipo().name() + "," // Usamos name() para obtener el valor del enum
                         + fechaInicioStr + ","
                         + fechaFinStr
                 );
@@ -269,7 +269,7 @@ public class GestionFicheros {
                     int id = Integer.parseInt(datos[0]);
                     int parcelaId = Integer.parseInt(datos[1]);
                     int maquinaId = Integer.parseInt(datos[2]);
-                    String tipo = datos[3];
+                    String tipoStr = datos[3]; // El tipo se toma como String primero
                     String fechaInicioStr = datos[4];
                     String fechaFinStr = datos[5];
 
@@ -279,11 +279,11 @@ public class GestionFicheros {
 
                     try {
                         if (!fechaInicioStr.isEmpty()) {
-                            fechaInicio = LocalDate.parse(fechaInicioStr, dateFormat); // Convertimos la fecha de inicio
+                            fechaInicio = LocalDate.parse(fechaInicioStr, dateFormat); 
                         }
                         // Solo convertimos fechaFin si no está vacía
                         if (!fechaFinStr.isEmpty()) {
-                            fechaFin = LocalDate.parse(fechaFinStr, dateFormat); // Convertimos la fecha de fin
+                            fechaFin = LocalDate.parse(fechaFinStr, dateFormat); 
                         }
                     } catch (Exception e) {
                         System.out.println("Formato de fecha inválido para el trabajo con ID: " + id);
@@ -295,9 +295,17 @@ public class GestionFicheros {
                     Maquina maquina = MenuMaquinas.buscarMaquinaPorId(maquinaId);
 
                     if (parcela != null && maquina != null) {
-                        // Creamos el objeto Trabajo y lo agregamos a la lista
-                        Trabajo trabajo = new Trabajo(id, parcela, maquina, tipo, fechaInicio, fechaFin);
-                        trabajos.add(trabajo); // Agregamos el trabajo a la lista
+                        // Convertimos el tipo de trabajo de String a tipoAtrabajo (enum)
+                        Trabajo.tipoAtrabajo tipoTrabajo = null;
+                        try {
+                            tipoTrabajo = Trabajo.tipoAtrabajo.valueOf(tipoStr); // Convertimos la cadena al enum
+                        } catch (IllegalArgumentException e) {
+                            System.out.println("Tipo de trabajo inválido para el trabajo con ID: " + id);
+                            continue; // Pasamos al siguiente trabajo si el tipo no es válido
+                        }
+
+                        Trabajo trabajo = new Trabajo(id, parcela, maquina, tipoTrabajo, fechaInicio, fechaFin);
+                        trabajos.add(trabajo); 
                     } else {
                         System.out.println("No se encontró la parcela o la máquina para el trabajo con ID: " + id);
                     }

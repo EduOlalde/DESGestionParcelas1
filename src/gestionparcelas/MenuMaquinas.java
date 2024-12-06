@@ -180,13 +180,12 @@ public class MenuMaquinas {
         }
 
         // Mostrar las máquinas libres
-        System.out.println("Máquinas libres:");
+        System.out.println("\n--- Máquinas libres ---");
         Nodo<Maquina> nodo = maquinasLibres.getNodoInicio();
         while (nodo != null) {
             Maquina maquina = nodo.getInf();
             System.out.println("ID: " + maquina.getId() + ", tipo: "
-                    + maquina.getTipo() + ", modelo: " + maquina.getModelo()
-                    + "\n");
+                    + maquina.getTipo() + ", modelo: " + maquina.getModelo());
             nodo = nodo.getSig();
         }
 
