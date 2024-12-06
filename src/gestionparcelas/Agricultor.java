@@ -6,7 +6,7 @@ package gestionparcelas;
  */
 public class Agricultor {
 
-    private int id;
+    private final int id;
     private String nombre;
     private String password;
 
@@ -18,10 +18,6 @@ public class Agricultor {
 
     public int getId() {
         return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     public String getNombre() {

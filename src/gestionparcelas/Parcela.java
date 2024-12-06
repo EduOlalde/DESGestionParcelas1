@@ -7,14 +7,16 @@ package gestionparcelas;
  */
 public class Parcela {
 
-    private int id;
+    private final int id;
+    private final Agricultor agricultor;
     private String ubicacion;
     private double extension;
     private String cultivo;
 
     // Constructor
-    public Parcela(int id, String ubicacion, double extension, String cultivo) {
+    public Parcela(int id, Agricultor agricultor, String ubicacion, double extension, String cultivo) {
         this.id = id;
+        this.agricultor = agricultor;
         this.ubicacion = ubicacion;
         this.extension = extension;
         this.cultivo = cultivo;
@@ -23,6 +25,10 @@ public class Parcela {
     // Getters
     public int getId() {
         return id;
+    }
+    
+    public Agricultor getAgricultor(){
+        return this.agricultor;
     }
 
     public String getUbicacion() {
@@ -37,7 +43,7 @@ public class Parcela {
         return cultivo;
     }
 
-    // Setters (opcional, si necesitas modificar los datos de la parcela)
+    // Setters 
     public void setUbicacion(String ubicacion) {
         this.ubicacion = ubicacion;
     }
@@ -49,28 +55,14 @@ public class Parcela {
     public void setCultivo(String cultivo) {
         this.cultivo = cultivo;
     }
-
-    // Método para asignar un trabajo a la parcela
-    public void asignarTrabajo(Trabajo trabajo) {
-        // Aquí puedes añadir la lógica para asignar el trabajo a la parcela
-        // Por ejemplo, puedes añadir el trabajo a una lista de trabajos de la parcela
-        System.out.println("Trabajo " + trabajo.getId() + " asignado a la parcela " + id);
-    }
-
     
     @Override
     public String toString() {
         return "ID: " + id + "\n" +
+           "Agricultor: " + (agricultor != null ? agricultor.getId() : "No asignado") + "\n" +
            "Ubicación: " + ubicacion + "\n" +
            "Extensión: " + extension + " hectáreas\n" +
            "Cultivo: " + cultivo;
     }
-    
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (obj == null || getClass() != obj.getClass()) return false;
-        Parcela parcela = (Parcela) obj;
-        return id == parcela.id;
-}
+ 
 }

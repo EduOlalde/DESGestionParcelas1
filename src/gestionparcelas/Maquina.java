@@ -6,13 +6,14 @@ package gestionparcelas;
  */
 public class Maquina {
 
-    private int id;
+    private final int id;
     private String tipo;
     private String modelo;
     private String estado;
 
     // Constructor
-    public Maquina(String tipo, String modelo, String estado) {
+    public Maquina(int id, String tipo, String modelo, String estado) {
+        this.id = id;
         this.tipo = tipo;
         this.modelo = modelo;
         this.estado = estado;
@@ -36,10 +37,6 @@ public class Maquina {
     }
 
     // Setters
-    public void setId(int id) {
-        this.id = id;
-    }
-
     public void setTipo(String tipo) {
         this.tipo = tipo;
     }
@@ -66,18 +63,6 @@ public class Maquina {
                 + "Tipo: " + tipo + "\n"
                 + "Modelo: " + modelo + "\n"
                 + "Estado: " + estado;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null || getClass() != obj.getClass()) {
-            return false;
-        }
-        Maquina maquina = (Maquina) obj;
-        return id == maquina.id;
     }
 
 }
