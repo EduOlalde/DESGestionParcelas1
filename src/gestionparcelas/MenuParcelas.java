@@ -60,9 +60,13 @@ public class MenuParcelas {
     private static void altaParcela() {
         // Generar un nuevo ID automático tomando el último ID + 1
         int nuevoId = 1;
-        Nodo<Parcela> nodo = parcelas.getNodoInicial();
-        if (nodo != null) {
-            nuevoId = nodo.getInf().getId() + 1;
+        Iterador<Parcela> iter = new Iterador<>(parcelas);
+        while (iter.hasNext()) {
+            iter.next();  // Avanzamos hasta el final
+        }
+
+        if (iter.hayElemento()) {
+            nuevoId = iter.dameValor().getId() + 1;
         }
 
         System.out.println("Alta de parcela:");
@@ -105,9 +109,9 @@ public class MenuParcelas {
     private static void modificarParcela() {
         int id = leerEntero("ID de la parcela a modificar: ");
 
-        Nodo<Parcela> nodo = parcelas.getNodoInicial();
-        while (nodo != null) {
-            Parcela parcela = nodo.getInf();
+        Iterador<Parcela> iter = new Iterador<>(parcelas);
+        while (iter.hasNext()) {
+            Parcela parcela = iter.dameValor();
             if (parcela.getId() == id) {
                 parcela.setUbicacion(leerCadena("Nueva ubicación: "));
                 parcela.setExtension(leerReal("Nueva extensión (en hectáreas): "));
@@ -116,7 +120,7 @@ public class MenuParcelas {
                 guardarParcelasEnArchivo(parcelas);
                 return;
             }
-            nodo = nodo.getSig();
+            iter.next();
         }
         System.out.println("Parcela no encontrada.");
     }
@@ -127,14 +131,15 @@ public class MenuParcelas {
      */
     public static void listarParcelas() {
         System.out.println("\n--- Parcelas ---");
-        Nodo<Parcela> nodo = parcelas.getNodoInicial();
-        if (nodo == null) {
-            System.out.println("No hay trabajos registrados.");
+        Iterador<Parcela> iter = new Iterador<>(parcelas);
+        if (!iter.hayElemento()) {
+            System.out.println("No hay parcelas registradas.");
             return;
         }
-        while (nodo != null) {
-            System.out.println(nodo.getInf().toString());
-            nodo = nodo.getSig();
+
+        while (iter.hayElemento()) {
+            System.out.println(iter.dameValor().toString());
+            iter.next();
         }
     }
 
@@ -147,12 +152,13 @@ public class MenuParcelas {
      * con el ID dado.
      */
     public static Parcela buscarParcelaPorId(int id) {
-        Nodo<Parcela> nodo = parcelas.getNodoInicial();
-        while (nodo != null) {
-            if (nodo.getInf().getId() == id) {
-                return nodo.getInf();
+        Iterador<Parcela> iter = new Iterador<>(parcelas);
+        while (iter.hayElemento()) {
+            Parcela parcela = iter.dameValor();
+            if (parcela.getId() == id) {
+                return parcela;
             }
-            nodo = nodo.getSig();
+            iter.next();
         }
         return null; // Retorna null si no encuentra la parcela
     }

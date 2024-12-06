@@ -64,9 +64,13 @@ public class MenuMaquinas {
     private static void altaMaquina() {
         // Generar un nuevo ID automático tomando el último ID + 1
         int nuevoId = 1;
-        Nodo<Maquina> nodo = maquinas.getNodoInicial();
-        if (nodo != null) {
-            nuevoId = nodo.getInf().getId() + 1;
+        Iterador<Maquina> iter = new Iterador<>(maquinas);
+        while (iter.hayElemento()) {
+            iter.next();  // Avanzamos hasta el final
+        }
+
+        if (iter.hayElemento()) {
+            nuevoId = iter.dameValor().getId() + 1;
         }
 
         System.out.println("Alta de máquina:");
@@ -109,9 +113,9 @@ public class MenuMaquinas {
     private static void modificarMaquina() {
         int id = leerEntero("ID de la máquina a modificar: ");
 
-        Nodo<Maquina> nodo = maquinas.getNodoInicial();
-        while (nodo != null) {
-            Maquina maquina = nodo.getInf();
+        Iterador<Maquina> iter = new Iterador<>(maquinas);
+        while (iter.hayElemento()) {
+            Maquina maquina = iter.dameValor();
             if (maquina.getId() == id) {
                 maquina.setTipo(leerCadena("Nuevo tipo: "));
                 maquina.setModelo(leerCadena("Nuevo modelo: "));
@@ -136,7 +140,7 @@ public class MenuMaquinas {
                 guardarMaquinasEnArchivo(maquinas);
                 return;
             }
-            nodo = nodo.getSig();
+            iter.next();
         }
         System.out.println("Máquina no encontrada.");
     }
@@ -147,14 +151,15 @@ public class MenuMaquinas {
      */
     public static void listarMaquinas() {
         System.out.println("\n--- Máquinas ---");
-        Nodo<Maquina> nodo = maquinas.getNodoInicial();
-        if (nodo == null) {
+        Iterador<Maquina> iter = new Iterador<>(maquinas);
+        if (!iter.hayElemento()) {
             System.out.println("No hay máquinas registradas.");
             return;
         }
-        while (nodo != null) {
-            System.out.println(nodo.getInf().toString());
-            nodo = nodo.getSig();
+
+        while (iter.hayElemento()) {
+            System.out.println(iter.dameValor().toString());
+            iter.next();
         }
     }
 
@@ -170,13 +175,13 @@ public class MenuMaquinas {
         Cola<Maquina> maquinasLibres = new Cola<>();
 
         // Recorrer la lista de máquinas y encolar las que están libres
-        Nodo<Maquina> nodoMaquina = maquinas.getNodoInicial();
-        while (nodoMaquina != null) {
-            Maquina maquina = nodoMaquina.getInf();
+        Iterador<Maquina> iter = new Iterador<>(maquinas);
+        while (iter.hayElemento()) {
+            Maquina maquina = iter.dameValor();
             if (maquina.getEstado() == Estado.libre) {
                 maquinasLibres.encolar(maquina);
             }
-            nodoMaquina = nodoMaquina.getSig();
+            iter.next();
         }
 
         // Mostrar las máquinas libres
@@ -204,12 +209,13 @@ public class MenuMaquinas {
      * @return La máquina encontrada o `null` si no la encuentra.
      */
     public static Maquina buscarMaquinaPorId(int id) {
-        Nodo<Maquina> nodo = maquinas.getNodoInicial();
-        while (nodo != null) {
-            if (nodo.getInf().getId() == id) {
-                return nodo.getInf();
+        Iterador<Maquina> iter = new Iterador<>(maquinas);
+        while (iter.hayElemento()) {
+            Maquina maquina = iter.dameValor();
+            if (maquina.getId() == id) {
+                return maquina;
             }
-            nodo = nodo.getSig();
+            iter.next();
         }
         return null; // Retorna null si no encuentra la máquina
     }

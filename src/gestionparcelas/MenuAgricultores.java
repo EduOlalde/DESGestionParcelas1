@@ -8,17 +8,16 @@ import static gestionparcelas.GestionParcelas.agricultores;
 
 /**
  * Clase que gestiona el menú de operaciones relacionadas con los agricultores.
- * Permite al usuario realizar acciones como alta, baja, modificación, listado
- * y selección de agricultores. También gestiona la búsqueda de agricultores
- * por su ID y guarda los datos en archivos.
- * 
- * @author Eduardo Olalde
+ * Permite al usuario realizar acciones como alta, baja, modificación, listado y
+ * selección de agricultores. También gestiona la búsqueda de agricultores por
+ * su ID y guarda los datos en archivos.
  */
 public class MenuAgricultores {
 
     /**
-     * Muestra el menú de gestión de agricultores y permite al usuario seleccionar
-     * entre varias opciones: alta, baja, modificación, listado o volver al menú principal.
+     * Muestra el menú de gestión de agricultores y permite al usuario
+     * seleccionar entre varias opciones: alta, baja, modificación, listado o
+     * volver al menú principal.
      */
     public static void mostrarMenu() {
         boolean salir = false;
@@ -34,27 +33,38 @@ public class MenuAgricultores {
             int opcion = leerEntero("Selecciona una opción: ");
 
             switch (opcion) {
-                case 1 -> altaAgricultor();
-                case 2 -> bajaAgricultor();
-                case 3 -> modificarAgricultor();
-                case 4 -> listarAgricultores();
-                case 5 -> salir = true;
-                default -> System.out.println("Opción no válida. Intente nuevamente.");
+                case 1 ->
+                    altaAgricultor();
+                case 2 ->
+                    bajaAgricultor();
+                case 3 ->
+                    modificarAgricultor();
+                case 4 ->
+                    listarAgricultores();
+                case 5 ->
+                    salir = true;
+                default ->
+                    System.out.println("Opción no válida. Intente nuevamente.");
             }
         }
     }
 
     /**
-     * Permite dar de alta a un nuevo agricultor. Se solicita el nombre y la contraseña,
-     * se asigna un ID automáticamente y se guarda el nuevo agricultor en la lista.
-     * También se guarda la lista actualizada en el archivo correspondiente.
+     * Permite dar de alta a un nuevo agricultor. Se solicita el nombre y la
+     * contraseña, se asigna un ID automáticamente y se guarda el nuevo
+     * agricultor en la lista. También se guarda la lista actualizada en el
+     * archivo correspondiente.
      */
     private static void altaAgricultor() {
         // Generar un nuevo ID automático tomando el último ID + 1
         int nuevoId = 1;
-        Nodo<Agricultor> nodo = agricultores.getNodoInicial();
-        if (nodo != null) {
-            nuevoId = nodo.getInf().getId() + 1;
+        Iterador<Agricultor> iterador = new Iterador<>(agricultores);
+        if (iterador.hayElemento()) {
+            while (iterador.hayElemento()) {
+                Agricultor agricultor = iterador.dameValor();
+                nuevoId = agricultor.getId() + 1;
+                iterador.next();
+            }
         }
 
         System.out.println("\n--- Alta de Agricultor ---");
@@ -69,9 +79,9 @@ public class MenuAgricultores {
     }
 
     /**
-     * Permite eliminar un agricultor existente. Se solicita el ID del agricultor
-     * a eliminar y, si se encuentra en la lista, se elimina. La lista se guarda
-     * después de la eliminación.
+     * Permite eliminar un agricultor existente. Se solicita el ID del
+     * agricultor a eliminar y, si se encuentra en la lista, se elimina. La
+     * lista se guarda después de la eliminación.
      */
     private static void bajaAgricultor() {
         System.out.println("Baja de agricultor:");
@@ -94,9 +104,9 @@ public class MenuAgricultores {
     private static void modificarAgricultor() {
         int id = leerEntero("ID del agricultor a modificar: ");
 
-        Nodo<Agricultor> nodo = agricultores.getNodoInicial();
-        while (nodo != null) {
-            Agricultor agricultor = nodo.getInf();
+        Iterador<Agricultor> iterador = new Iterador<>(agricultores);
+        while (iterador.hayElemento()) {
+            Agricultor agricultor = iterador.dameValor();
             if (agricultor.getId() == id) {
                 agricultor.setNombre(leerCadena("Nuevo nombre: "));
                 agricultor.setPassword(leerCadena("Nueva password: "));
@@ -104,44 +114,47 @@ public class MenuAgricultores {
                 guardarAgricultoresEnArchivo(agricultores);
                 return;
             }
-            nodo = nodo.getSig();
+            iterador.next();
         }
 
         System.out.println("Agricultor no encontrado.");
     }
 
     /**
-     * Muestra un listado de todos los agricultores registrados. Si no hay agricultores
-     * en la lista, se informa al usuario de que no hay datos disponibles.
+     * Muestra un listado de todos los agricultores registrados. Si no hay
+     * agricultores en la lista, se informa al usuario de que no hay datos
+     * disponibles.
      */
     public static void listarAgricultores() {
         System.out.println("\n--- Agricultores ---");
-        Nodo<Agricultor> nodo = agricultores.getNodoInicial();
-        if (nodo == null) {
+        Iterador<Agricultor> iterador = new Iterador<>(agricultores);
+        if (!iterador.hayElemento()) {
             System.out.println("No hay agricultores registrados.");
             return;
         }
 
-        while (nodo != null) {
-            System.out.println(nodo.getInf());
-            nodo = nodo.getSig();
+        while (iterador.hayElemento()) {
+            System.out.println(iterador.dameValor());
+            iterador.next();
         }
     }
 
     /**
-     * Permite seleccionar un agricultor de la lista de agricultores. Muestra los agricultores
-     * registrados y solicita al usuario que ingrese el ID de un agricultor. Si se elige
-     * un agricultor válido, se retorna el objeto correspondiente, o `null` si no se selecciona ninguno.
-     * 
-     * @return El agricultor seleccionado o `null` si no se selecciona ningún agricultor.
+     * Permite seleccionar un agricultor de la lista de agricultores. Muestra
+     * los agricultores registrados y solicita al usuario que ingrese el ID de
+     * un agricultor. Si se elige un agricultor válido, se retorna el objeto
+     * correspondiente, o `null` si no se selecciona ninguno.
+     *
+     * @return El agricultor seleccionado o `null` si no se selecciona ningún
+     * agricultor.
      */
     public static Agricultor seleccionarAgricultor() {
         System.out.println("Seleccione un agricultor:");
-        Nodo<Agricultor> nodoAgricultor = agricultores.getNodoInicial();
-        while (nodoAgricultor != null) {
-            Agricultor agricultor = nodoAgricultor.getInf();
+        Iterador<Agricultor> iteradorAgricultor = new Iterador<>(agricultores);
+        while (iteradorAgricultor.hayElemento()) {
+            Agricultor agricultor = iteradorAgricultor.dameValor();
             System.out.println(agricultor.getId() + ". " + agricultor.getNombre());
-            nodoAgricultor = nodoAgricultor.getSig();
+            iteradorAgricultor.next();
         }
         int agricultorId = leerEntero("Ingrese el ID del agricultor (0 para ninguno): ");
         if (agricultorId == 0) {
@@ -153,17 +166,18 @@ public class MenuAgricultores {
     /**
      * Busca un agricultor por su ID. Si encuentra un agricultor con el ID dado,
      * lo retorna. Si no, retorna `null`.
-     * 
+     *
      * @param id El ID del agricultor a buscar.
-     * @return El agricultor encontrado o `null` si no se encuentra el agricultor con el ID dado.
+     * @return El agricultor encontrado o `null` si no se encuentra el
+     * agricultor con el ID dado.
      */
     public static Agricultor buscarAgricultorPorId(int id) {
-        Nodo<Agricultor> nodo = agricultores.getNodoInicial();
-        while (nodo != null) {
-            if (nodo.getInf().getId() == id) {
-                return nodo.getInf();
+        Iterador<Agricultor> iterador = new Iterador<>(agricultores);
+        while (iterador.hayElemento()) {
+            if (iterador.dameValor().getId() == id) {
+                return iterador.dameValor();
             }
-            nodo = nodo.getSig();
+            iterador.next();
         }
         return null; // Retorna null si no encuentra el agricultor
     }
