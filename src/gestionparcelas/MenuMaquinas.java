@@ -65,38 +65,38 @@ public class MenuMaquinas {
     private static void altaMaquina() {
         // Generar un nuevo ID automático tomando el mayor ID existente + 1
         int nuevoId = 1;
-        
+
         Iterador<Maquina> iterador = new Iterador<>(maquinas);
         while (iterador.hayElemento()) {
             Maquina maquina = iterador.dameValor();
-            
+
             if (maquina.getId() >= nuevoId) {
                 nuevoId = maquina.getId() + 1;
             }
             iterador.next();
         }
-              
+
         System.out.println("Alta de máquina:");
         System.out.println("Tipos de máquinas disponibles:");
         for (TipoTrabajo tipo : TipoTrabajo.values()) {
-            System.out.println("- " + tipo.name());
+            System.out.println(tipo.ordinal() + 1 + ". " + tipo.name());
         }
 
-        // Leer y validar el tipo
-        TipoTrabajo tipo = null;
-        while (tipo == null) {
-            String tipoStr = leerCadena("Tipo de máquina: ").toLowerCase();
-            try {
-                tipo = TipoTrabajo.valueOf(tipoStr);
-            } catch (IllegalArgumentException e) {
-                System.out.println("Tipo no válido. Intente nuevamente.");
-            }
+        int tipoTrabajoSeleccionado = leerEntero("Ingrese el número del tipo de trabajo: ");
+
+        // Validar que la opción esté en el rango de tipos disponibles
+        if (tipoTrabajoSeleccionado < 1 || tipoTrabajoSeleccionado > TipoTrabajo.values().length) {
+            System.out.println("Opción no válida. Inténtelo de nuevo.");
+            return;
         }
+
+        // Convertir la selección en un valor del enum TipoTrabajo
+        TipoTrabajo tipoTrabajo = TipoTrabajo.values()[tipoTrabajoSeleccionado - 1];
 
         String modelo = leerCadena("Modelo de máquina: ");
-        Estado estado = Estado.libre; // Asignar estado inicial como "libre"
+        Estado estado = Estado.libre;
 
-        Maquina nuevaMaquina = new Maquina(nuevoId, tipo, modelo, estado);
+        Maquina nuevaMaquina = new Maquina(nuevoId, tipoTrabajo, modelo, estado);
 
         maquinas.add(nuevaMaquina);
         guardarMaquinasEnArchivo(maquinas);
@@ -114,7 +114,7 @@ public class MenuMaquinas {
         int id = leerEntero("ID de la máquina a eliminar: ");
         Maquina temp = new Maquina(id, TipoTrabajo.arar, "", Estado.libre); // Tipo genérico para búsqueda
 
-        if (maquinas.borrarElemento(temp)) {
+        if (maquinas.borrarTodos(temp)) {
             guardarMaquinasEnArchivo(maquinas);
             System.out.println("Máquina eliminada correctamente.");
         } else {
@@ -137,39 +137,41 @@ public class MenuMaquinas {
             if (maquina.getId() == id) {
                 System.out.println("Tipos de máquinas disponibles:");
                 for (TipoTrabajo tipo : TipoTrabajo.values()) {
-                    System.out.println("- " + tipo.name());
+                    System.out.println(tipo.ordinal() + 1 + ". " + tipo.name());
+                }
+               
+                int tipoTrabajoSeleccionado = leerEntero("Ingrese el número del nuevo tipo de trabajo: ");
+
+                // Validar que la opción esté en el rango de tipos disponibles
+                if (tipoTrabajoSeleccionado < 1 || tipoTrabajoSeleccionado > TipoTrabajo.values().length) {
+                    System.out.println("Opción no válida. Inténtelo de nuevo.");
+                    return;
                 }
 
-                // Leer y validar el nuevo tipo
-                TipoTrabajo tipo = null;
-                while (tipo == null) {
-                    String tipoStr = leerCadena("Nuevo tipo: ").toLowerCase();
-                    try {
-                        tipo = TipoTrabajo.valueOf(tipoStr);
-                    } catch (IllegalArgumentException e) {
-                        System.out.println("Tipo no válido. Intente nuevamente.");
-                    }
-                }
-
-                maquina.setTipoTrabajo(tipo);
-                maquina.setModelo(leerCadena("Nuevo modelo: "));
+                // Convertir la selección en un valor del enum TipoTrabajo
+                TipoTrabajo tipo = TipoTrabajo.values()[tipoTrabajoSeleccionado - 1];
+               
                 System.out.println("Estados disponibles: ");
                 for (Estado estado : Estado.values()) {
-                    System.out.println("- " + estado.name());
+                    System.out.println(estado.ordinal() + 1 + ". " + estado.name());
                 }
-
-                // Leer y validar el nuevo estado
-                while (true) {
-                    String estadoStr = leerCadena("Nuevo estado: ");
-                    try {
-                        Estado nuevoEstado = Estado.valueOf(estadoStr.toLowerCase());
-                        maquina.setEstado(nuevoEstado);
-                        break;
-                    } catch (IllegalArgumentException e) {
-                        System.out.println("Estado no válido. Intente nuevamente.");
-                    }
+                
+                // Leer la opción del estado
+                int tipoEstadoSeleccionado = leerEntero("Ingrese el número del nuevo estado: ");
+                
+                // Validar que la opción esté en el rango de tipos disponibles
+                if (tipoEstadoSeleccionado < 1 || tipoEstadoSeleccionado > Estado.values().length){
+                    System.out.println("Opción no válida. Inténtelo de nuevo.");
+                    return;
                 }
-
+                
+                // Convertir la selección en un valor del enum Estado
+                Estado estado = Estado.values()[tipoEstadoSeleccionado - 1];           
+                
+                maquina.setModelo(leerCadena("Nuevo modelo: "));
+                maquina.setTipoTrabajo(tipo);
+                maquina.setEstado(estado);
+                
                 System.out.println("Máquina modificada correctamente.");
                 guardarMaquinasEnArchivo(maquinas);
                 return;
@@ -218,7 +220,6 @@ public class MenuMaquinas {
             iter.next();
         }
 
-        // Mostrar las máquinas libres
         System.out.println("\n--- Máquinas libres ---");
         Nodo<Maquina> nodo = maquinasLibres.getNodoInicio();
         while (nodo != null) {
@@ -251,6 +252,6 @@ public class MenuMaquinas {
             }
             iter.next();
         }
-        return null; // Retorna null si no encuentra la máquina
+        return null;
     }
 }

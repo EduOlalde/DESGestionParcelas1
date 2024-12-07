@@ -95,7 +95,7 @@ public class MenuParcelas {
         int id = leerEntero("ID de la parcela a eliminar: ");
         Parcela temp = new Parcela(id, null, "", 0, "");
 
-        if (parcelas.borrarElemento(temp)) {
+        if (parcelas.borrarTodos(temp)) {
             guardarParcelasEnArchivo(parcelas);
             System.out.println("Parcela eliminada correctamente.");
         } else {
@@ -162,7 +162,7 @@ public class MenuParcelas {
             }
             iter.next();
         }
-        return null; // Retorna null si no encuentra la parcela
+        return null;
     }
 
 }

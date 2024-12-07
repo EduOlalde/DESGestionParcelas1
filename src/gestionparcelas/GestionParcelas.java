@@ -136,7 +136,6 @@ public class GestionParcelas {
                 System.out.println("Formato incorrecto. Use el formato yyyy-MM-dd.");
             }
         }
-
         return fecha;
     }
 

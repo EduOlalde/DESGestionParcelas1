@@ -12,8 +12,9 @@ import java.io.Serializable;
  * @author Eduardo Olalde
  */
 public class Maquina implements Serializable {
+
     private static final long serialVersionUID = 1L;
-    
+
     // Enumeración que define los posibles estados de una máquina.
     public enum Estado {
         libre, // La máquina está disponible para ser asignada.
@@ -131,7 +132,7 @@ public class Maquina implements Serializable {
 
     /**
      * Devuelve una representación en forma de cadena de la máquina, incluyendo
- su ID, tipoTrabajo, modelo y estado actual.
+     * su ID, tipoTrabajo, modelo y estado actual.
      *
      * @return Una cadena que representa la máquina.
      */
@@ -142,4 +143,34 @@ public class Maquina implements Serializable {
                 + "\tModelo: " + modelo
                 + "\tEstado: " + estado;
     }
+
+    /**
+     * Compara este objeto con otro para verificar si son iguales. Dos objetos
+     * son iguales si tienen el mismo ID.
+     *
+     * @param obj El objeto con el que se comparará.
+     * @return true si los objetos tienen el mismo ID; false en caso contrario.
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false; 
+        }
+        Maquina that = (Maquina) obj;
+        return this.id == that.id; 
+    }
+
+    /**
+     * Devuelve un código hash para el objeto, basado en el ID.
+     *
+     * @return Un valor de hash basado en el ID.
+     */
+    @Override
+    public int hashCode() {
+        return Integer.hashCode(id);
+    }
+
 }

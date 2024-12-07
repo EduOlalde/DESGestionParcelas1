@@ -12,7 +12,7 @@ import java.io.Serializable;
  * @autor Eduardo Olalde
  */
 public class Agricultor implements Serializable {
-    
+
     private static final long serialVersionUID = 1L;
 
     private final int id;       // Identificador único del agricultor
@@ -84,7 +84,36 @@ public class Agricultor implements Serializable {
      */
     @Override
     public String toString() {
-        return "ID: " + id + 
-                "\tNombre: " + nombre;
+        return "ID: " + id
+                + "\tNombre: " + nombre;
+    }
+
+    /**
+     * Compara este objeto con otro para verificar si son iguales. Dos objetos
+     * son iguales si tienen el mismo ID.
+     *
+     * @param obj El objeto con el que se comparará.
+     * @return true si los objetos tienen el mismo ID; false en caso contrario.
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true; // Mismo objeto
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false; // Clase diferente o null
+        }
+        Agricultor that = (Agricultor) obj;
+        return this.id == that.id; // Comparación por ID
+    }
+
+    /**
+     * Devuelve un código hash para el objeto, basado en el ID.
+     *
+     * @return Un valor de hash basado en el ID.
+     */
+    @Override
+    public int hashCode() {
+        return Integer.hashCode(id);
     }
 }

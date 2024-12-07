@@ -90,7 +90,7 @@ public class MenuAgricultores {
         int id = leerEntero("ID del agricultor a eliminar: ");
         Agricultor temp = new Agricultor(id, "", "");
 
-        if (agricultores.borrarElemento(temp)) {
+        if (agricultores.borrarTodos(temp)) {
             guardarAgricultoresEnArchivo(agricultores);
             System.out.println("Agricultor eliminado correctamente.");
         } else {
@@ -181,6 +181,6 @@ public class MenuAgricultores {
             }
             iterador.next();
         }
-        return null; // Retorna null si no encuentra el agricultor
+        return null; 
     }
 }

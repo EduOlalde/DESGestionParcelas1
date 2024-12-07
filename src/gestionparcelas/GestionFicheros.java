@@ -26,14 +26,14 @@ public class GestionFicheros {
      */
     public static void guardarAgricultoresEnArchivo(Lista agricultores) {
         try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream("agricultores.bin"))) {
-            // Usamos un iterador para recorrer la lista y guardar cada agricultor
+            
             Iterador<Agricultor> iterador = new Iterador<>(agricultores);
             while (iterador.hayElemento()) {
                 Agricultor agricultor = iterador.dameValor();
                 out.writeObject(agricultor); // Escribe cada agricultor individualmente
                 iterador.next();
             }
-            System.out.println("Datos de agricultores guardados correctamente en archivo binario.");
+            System.out.println("Datos de agricultores guardados correctamente.");
         } catch (IOException e) {
             System.out.println("Error al guardar los datos de agricultores: " + e.getMessage());
         }
@@ -50,14 +50,14 @@ public class GestionFicheros {
     @SuppressWarnings("unchecked") // Para evitar advertencias sobre cast
     public static void cargarAgricultoresDesdeArchivo(Lista agricultores) {
         try (ObjectInputStream in = new ObjectInputStream(new FileInputStream("agricultores.bin"))) {
-            // Limpiar la lista actual antes de agregar los elementos cargados
+            
             agricultores.vaciarLista();
 
             // Intentamos leer objetos uno por uno hasta que no haya más
             while (true) {
                 try {
                     Agricultor agricultor = (Agricultor) in.readObject();
-                    agricultores.add(agricultor); // Agregar agricultor a la lista
+                    agricultores.add(agricultor); 
                 } catch (EOFException e) {
                     // Fin del archivo alcanzado
                     break;
@@ -66,7 +66,7 @@ public class GestionFicheros {
                 }
             }
 
-            System.out.println("Datos de agricultores cargados correctamente desde archivo binario.");
+            System.out.println("Datos de agricultores cargados correctamente.");
         } catch (FileNotFoundException e) {
             System.out.println("Archivo de agricultores no encontrado. Se iniciará con una lista vacía.");
         } catch (IOException e) {
@@ -82,14 +82,14 @@ public class GestionFicheros {
      */
     public static void guardarMaquinasEnArchivo(Lista maquinas) {
         try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream("maquinas.bin"))) {
-            // Usamos un iterador para recorrer la lista y guardar cada máquina
+            
             Iterador<Maquina> iterador = new Iterador<>(maquinas);
             while (iterador.hayElemento()) {
                 Maquina maquina = iterador.dameValor();
                 out.writeObject(maquina); // Escribe cada máquina individualmente
                 iterador.next();
             }
-            System.out.println("Datos de máquinas guardados correctamente en archivo binario.");
+            System.out.println("Datos de máquinas guardados correctamente.");
         } catch (IOException e) {
             System.out.println("Error al guardar los datos de máquinas: " + e.getMessage());
         }
@@ -106,14 +106,14 @@ public class GestionFicheros {
     @SuppressWarnings("unchecked") // Para evitar advertencias sobre cast
     public static void cargarMaquinasDesdeArchivo(Lista maquinas) {
         try (ObjectInputStream in = new ObjectInputStream(new FileInputStream("maquinas.bin"))) {
-            // Limpiar la lista actual antes de agregar los elementos cargados
+            
             maquinas.vaciarLista();
 
             // Intentamos leer objetos uno por uno hasta que no haya más
             while (true) {
                 try {
                     Maquina maquina = (Maquina) in.readObject();
-                    maquinas.add(maquina); // Agregar máquina a la lista
+                    maquinas.add(maquina); 
                 } catch (EOFException e) {
                     // Fin del archivo alcanzado
                     break;
@@ -122,7 +122,7 @@ public class GestionFicheros {
                 }
             }
 
-            System.out.println("Datos de máquinas cargados correctamente desde archivo binario.");
+            System.out.println("Datos de máquinas cargados correctamente.");
         } catch (FileNotFoundException e) {
             System.out.println("Archivo de máquinas no encontrado. Se iniciará con una lista vacía.");
         } catch (IOException e) {
@@ -138,14 +138,14 @@ public class GestionFicheros {
      */
     public static void guardarParcelasEnArchivo(Lista parcelas) {
         try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream("parcelas.bin"))) {
-            // Usamos un iterador para recorrer la lista y guardar cada parcela
+            
             Iterador<Parcela> iterador = new Iterador<>(parcelas);
             while (iterador.hayElemento()) {
                 Parcela parcela = iterador.dameValor();
                 out.writeObject(parcela); // Escribe cada parcela individualmente
                 iterador.next();
             }
-            System.out.println("Datos de parcelas guardados correctamente en archivo binario.");
+            System.out.println("Datos de parcelas guardados correctamente.");
         } catch (IOException e) {
             System.out.println("Error al guardar los datos de parcelas: " + e.getMessage());
         }
@@ -162,14 +162,14 @@ public class GestionFicheros {
     @SuppressWarnings("unchecked") // Para evitar advertencias sobre cast
     public static void cargarParcelasDesdeArchivo(Lista parcelas) {
         try (ObjectInputStream in = new ObjectInputStream(new FileInputStream("parcelas.bin"))) {
-            // Limpiar la lista actual antes de agregar los elementos cargados
+            
             parcelas.vaciarLista();
 
             // Intentamos leer objetos uno por uno hasta que no haya más
             while (true) {
                 try {
                     Parcela parcela = (Parcela) in.readObject();
-                    parcelas.add(parcela); // Agregar parcela a la lista
+                    parcelas.add(parcela); 
                 } catch (EOFException e) {
                     // Fin del archivo alcanzado
                     break;
@@ -178,7 +178,7 @@ public class GestionFicheros {
                 }
             }
 
-            System.out.println("Datos de parcelas cargados correctamente desde archivo binario.");
+            System.out.println("Datos de parcelas cargados correctamente.");
         } catch (FileNotFoundException e) {
             System.out.println("Archivo de parcelas no encontrado. Se iniciará con una lista vacía.");
         } catch (IOException e) {
@@ -194,14 +194,14 @@ public class GestionFicheros {
      */
     public static void guardarTrabajosEnArchivo(Lista trabajos) {
         try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream("trabajos.bin"))) {
-            // Usamos un iterador para recorrer la lista y guardar cada trabajo
+            
             Iterador<Trabajo> iterador = new Iterador<>(trabajos);
             while (iterador.hayElemento()) {
                 Trabajo trabajo = iterador.dameValor();
                 out.writeObject(trabajo); // Escribe cada trabajo individualmente
                 iterador.next();
             }
-            System.out.println("Datos de trabajos guardados correctamente en archivo binario.");
+            System.out.println("Datos de trabajos guardados correctamente.");
         } catch (IOException e) {
             System.out.println("Error al guardar los datos de trabajos: " + e.getMessage());
         }
@@ -218,7 +218,7 @@ public class GestionFicheros {
     @SuppressWarnings("unchecked") // Para evitar advertencias sobre cast
     public static void cargarTrabajosDesdeArchivo(Lista trabajos) {
         try (ObjectInputStream in = new ObjectInputStream(new FileInputStream("trabajos.bin"))) {
-            // Limpiar la lista actual antes de agregar los elementos cargados
+            
             trabajos.vaciarLista();
 
             // Intentamos leer objetos uno por uno hasta que no haya más
@@ -234,7 +234,7 @@ public class GestionFicheros {
                 }
             }
 
-            System.out.println("Datos de trabajos cargados correctamente desde archivo binario.");
+            System.out.println("Datos de trabajos cargados correctamente.");
         } catch (FileNotFoundException e) {
             System.out.println("Archivo de trabajos no encontrado. Se iniciará con una lista vacía.");
         } catch (IOException e) {

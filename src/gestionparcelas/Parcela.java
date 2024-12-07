@@ -10,6 +10,7 @@ import java.io.Serializable;
  * @author Eduardo Olalde
  */
 public class Parcela implements Serializable {
+
     private static final long serialVersionUID = 1L;
 
     // Atributos
@@ -119,10 +120,39 @@ public class Parcela implements Serializable {
      */
     @Override
     public String toString() {
-        return "ID: " + id +
-                "\tAgricultor: " + (agricultor != null ? agricultor.getId() : "No asignado") +
-                "\tUbicación: " + ubicacion +
-                "\tExtensión: " + extension + " hectáreas" + 
-                "\tCultivo: " + cultivo;
+        return "ID: " + id
+                + "\tAgricultor: " + (agricultor != null ? agricultor.getId() : "No asignado")
+                + "\tUbicación: " + ubicacion
+                + "\tExtensión: " + extension + " hectáreas"
+                + "\tCultivo: " + cultivo;
+    }
+
+    /**
+     * Compara este objeto con otro para verificar si son iguales. Dos objetos
+     * son iguales si tienen el mismo ID.
+     *
+     * @param obj El objeto con el que se comparará.
+     * @return true si los objetos tienen el mismo ID; false en caso contrario.
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        Parcela that = (Parcela) obj;
+        return this.id == that.id;
+    }
+
+    /**
+     * Devuelve un código hash para el objeto, basado en el ID.
+     *
+     * @return Un valor de hash basado en el ID.
+     */
+    @Override
+    public int hashCode() {
+        return Integer.hashCode(id);
     }
 }
