@@ -2,7 +2,7 @@ package gestionparcelas;
 
 import ListasTemplates.*;
 import static gestionparcelas.GestionFicheros.guardarTrabajosEnArchivo;
-import static gestionparcelas.GestionParcelas.leerCadena;
+import static gestionparcelas.GestionFicheros.guardarMaquinasEnArchivo;
 import static gestionparcelas.GestionParcelas.leerEntero;
 import static gestionparcelas.GestionParcelas.leerFecha;
 import static gestionparcelas.GestionParcelas.parcelas;
@@ -152,12 +152,17 @@ public class MenuTrabajos {
         // Solicitar fecha de inicio
         LocalDate fechaInicio = leerFecha("Ingrese la fecha de inicio (formato: yyyy-MM-dd): ");
 
-        // Calcular el ID del nuevo trabajo (basado en la cantidad actual de trabajos)
+        // Generar un nuevo ID automático tomando el mayor ID existente + 1
         int idTrabajo = 1;
-        Iterador<Trabajo> iteradorTrabajos = new Iterador<>(trabajos);
-        while (iteradorTrabajos.hayElemento()) {
-            idTrabajo++;
-            iteradorTrabajos.next();
+
+        Iterador<Trabajo> iterador = new Iterador<>(trabajos);
+        while (iterador.hayElemento()) {
+            Trabajo trabajo = iterador.dameValor();
+
+            if (trabajo.getId() >= idTrabajo) {
+                idTrabajo = trabajo.getId() + 1;
+            }
+            iterador.next();
         }
 
         // Crear el objeto Trabajo con el constructor actualizado
@@ -176,32 +181,65 @@ public class MenuTrabajos {
     }
 
     /**
-     * Finaliza un trabajo ya asignado, solicitando la fecha de finalización.
-     * Además, libera la máquina que estaba asignada al trabajo.
+     * Finaliza un trabajo activo (con fecha de finalización null), solicitando
+     * la fecha de finalización. Además, libera la máquina que estaba asignada
+     * al trabajo.
      *
      * @see Trabajo#finalizarTrabajo(LocalDate)
      */
     private static void finalizarTrabajo() {
+        // Mostrar los trabajos activos (con fecha de finalización null)
+        System.out.println("\nTrabajos activos:");
+        Iterador<Trabajo> iteradorTrabajos = new Iterador<>(trabajos);
+        boolean hayTrabajosActivos = false;
+
+        // Recorrer la lista de trabajos y mostrar solo los que están activos (sin fecha de fin)
+        while (iteradorTrabajos.hasNext()) {
+            Trabajo trabajo = iteradorTrabajos.dameValor();
+
+            // Mostrar solo trabajos con fecha de finalización null
+            if (trabajo.getFechaFin() == null) {
+                hayTrabajosActivos = true;
+                // Mostrar información detallada del trabajo
+                System.out.println("ID: " + trabajo.getId()
+                        + " | Parcela: " + trabajo.getParcela().getUbicacion()
+                        + " | Máquina: " + trabajo.getMaquina().getId()
+                        + " | Tipo: " + trabajo.getTipoTrabajo()
+                        + " | Fecha de inicio: " + trabajo.getFechaInicio());
+            } else {
+                // Para depurar: mostrar trabajos que ya están finalizados
+                System.out.println("Trabajo ya finalizado: ID: " + trabajo.getId());
+            }
+
+            iteradorTrabajos.next();
+        }
+
+        if (!hayTrabajosActivos) {
+            System.out.println("No hay trabajos activos para finalizar.");
+            return;
+        }
+
         // Solicitar al usuario el ID del trabajo que desea finalizar
         int idTrabajo = leerEntero("Ingrese el ID del trabajo a finalizar: ");
 
-        // Buscar el trabajo en la lista de trabajos
-        Iterador<Trabajo> iteradorTrabajos = new Iterador<>(trabajos);
+        // Buscar el trabajo con el ID especificado y que esté activo
+        iteradorTrabajos = new Iterador<>(trabajos); // Reiniciar el iterador
         boolean trabajoEncontrado = false;
 
         while (iteradorTrabajos.hasNext()) {
             Trabajo trabajo = iteradorTrabajos.dameValor();
 
-            // Verificar si el trabajo tiene el ID proporcionado
-            if (trabajo.getId() == idTrabajo) {
+            // Verificar si el trabajo tiene el ID proporcionado y está activo
+            if (trabajo.getId() == idTrabajo && trabajo.getFechaFin() == null) {
                 trabajoEncontrado = true;
 
+                // Solicitar la fecha de finalización
                 LocalDate fechaFin = leerFecha("Ingrese la fecha de fin (formato: yyyy-MM-dd):");
 
                 // Validar y asignar la fecha de fin
                 if (fechaFin != null) {
                     trabajo.setFechaFin(fechaFin); // Asignar la fecha de fin al trabajo
-                    trabajo.getMaquina().setEstado(Estado.libre); // Libera la máquina usada
+                    trabajo.getMaquina().setEstado(Estado.libre); // Liberar la máquina usada
                     System.out.println("Trabajo finalizado con éxito.");
                 } else {
                     System.out.println("Fecha de fin no válida.");
@@ -214,12 +252,12 @@ public class MenuTrabajos {
         }
 
         if (!trabajoEncontrado) {
-            System.out.println("Trabajo con ID " + idTrabajo + " no encontrado.");
+            System.out.println("Trabajo con ID " + idTrabajo + " no encontrado o ya finalizado.");
         }
 
-        // Guardar trabajos en el archivo después de modificar el estado
+        // Guardar trabajos y máquinas en el archivo después de modificar el estado
         guardarTrabajosEnArchivo(trabajos);
-        GestionFicheros.guardarMaquinasEnArchivo(maquinas);
+        guardarMaquinasEnArchivo(maquinas);
     }
 
     /**
@@ -230,23 +268,29 @@ public class MenuTrabajos {
     public static void listarTrabajos() {
         System.out.println("\n--- Trabajos ---");
 
-        // Recorrer la lista de trabajos y mostrar su estado usando iterador
-        Iterador<Trabajo> iteradorTrabajos = new Iterador<>(trabajos);
-
-        if (!iteradorTrabajos.hayElemento()) {
+        // Verifica si la lista de trabajos está vacía
+        if (trabajos.esVacia()) {
             System.out.println("No hay trabajos registrados.");
             return;
         }
 
-        System.out.println("Lista de trabajos:");
-        while (iteradorTrabajos.hasNext()) {
+        // Usamos el iterador para recorrer la lista de trabajos
+        Iterador<Trabajo> iteradorTrabajos = new Iterador<>(trabajos);
+
+        // Recorrer la lista de trabajos
+        while (iteradorTrabajos.hayElemento()) {
             Trabajo trabajo = iteradorTrabajos.dameValor();
             String estado = (trabajo.getFechaFin() == null) ? "Asignado" : "Terminado";
+
+            // Mostrar información del trabajo
             System.out.println("Trabajo ID: " + trabajo.getId()
                     + " | Parcela: " + trabajo.getParcela().getUbicacion()
                     + " | Tipo: " + trabajo.getTipoTrabajo()
                     + " | Estado: " + estado);
+
+            // Avanzamos al siguiente elemento en el iterador
             iteradorTrabajos.next();
         }
     }
+
 }

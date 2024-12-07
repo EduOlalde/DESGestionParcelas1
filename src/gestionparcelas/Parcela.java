@@ -1,5 +1,7 @@
 package gestionparcelas;
 
+import java.io.Serializable;
+
 /**
  * Clase que representa una parcela agrícola. Cada parcela tiene un
  * identificador único, un agricultor asociado, una ubicación, una extensión en
@@ -7,7 +9,8 @@ package gestionparcelas;
  *
  * @author Eduardo Olalde
  */
-public class Parcela {
+public class Parcela implements Serializable {
+    private static final long serialVersionUID = 1L;
 
     // Atributos
     private final int id;                // Identificador único de la parcela.

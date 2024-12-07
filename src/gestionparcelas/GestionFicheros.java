@@ -2,9 +2,6 @@ package gestionparcelas;
 
 import ListasTemplates.*;
 import java.io.*;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import gestionparcelas.Maquina.Estado;
 
 /**
  * Clase encargada de gestionar la lectura y escritura de datos de agricultores,
@@ -21,48 +18,55 @@ import gestionparcelas.Maquina.Estado;
 public class GestionFicheros {
 
     /**
-     * Guarda la lista de agricultores en un archivo de texto llamado
-     * "agricultores.txt". Los datos de cada agricultor se almacenan en formato
-     * CSV (ID, nombre, password).
+     * Guarda la lista de agricultores en un archivo binario llamado
+     * "agricultores.bin". Los objetos agricultores se guardan individualmente.
      *
-     * @param agricultores La lista de agricultores a guardar en el archivo.
+     * @param agricultores La lista de agricultores a guardar en el archivo
+     * binario.
      */
     public static void guardarAgricultoresEnArchivo(Lista agricultores) {
-        try (PrintWriter writer = new PrintWriter(new FileWriter("agricultores.txt"))) {
-            // Usamos el iterador para recorrer la lista de agricultores
+        try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream("agricultores.bin"))) {
+            // Usamos un iterador para recorrer la lista y guardar cada agricultor
             Iterador<Agricultor> iterador = new Iterador<>(agricultores);
-
             while (iterador.hayElemento()) {
                 Agricultor agricultor = iterador.dameValor();
-                writer.println(agricultor.getId() + "," + agricultor.getNombre() + "," + agricultor.getPassword());
-                iterador.next(); // Avanzamos al siguiente agricultor
+                out.writeObject(agricultor); // Escribe cada agricultor individualmente
+                iterador.next();
             }
-            System.out.println("Datos de agricultores guardados correctamente.");
+            System.out.println("Datos de agricultores guardados correctamente en archivo binario.");
         } catch (IOException e) {
             System.out.println("Error al guardar los datos de agricultores: " + e.getMessage());
         }
     }
 
     /**
-     * Carga los agricultores desde el archivo "agricultores.txt" y los agrega a
-     * la lista de agricultores. El archivo debe contener los datos en formato
-     * CSV (ID, nombre, password).
+     * Carga los agricultores almacenados en un archivo binario llamado
+     * "agricultores.bin" y los agrega a la lista proporcionada. Los datos
+     * previos en la lista son eliminados.
      *
      * @param agricultores La lista donde se agregarán los agricultores cargados
-     * desde el archivo.
+     * desde el archivo binario.
      */
+    @SuppressWarnings("unchecked") // Para evitar advertencias sobre cast
     public static void cargarAgricultoresDesdeArchivo(Lista agricultores) {
-        try (BufferedReader reader = new BufferedReader(new FileReader("agricultores.txt"))) {
-            String linea;
-            while ((linea = reader.readLine()) != null) {
-                String[] datos = linea.split(",");
-                if (datos.length == 3) {
-                    int id = Integer.parseInt(datos[0]); // Recoger el id como entero
-                    Agricultor agricultor = new Agricultor(id, datos[1], datos[2]);
-                    agricultores.add(agricultor);
+        try (ObjectInputStream in = new ObjectInputStream(new FileInputStream("agricultores.bin"))) {
+            // Limpiar la lista actual antes de agregar los elementos cargados
+            agricultores.vaciarLista();
+
+            // Intentamos leer objetos uno por uno hasta que no haya más
+            while (true) {
+                try {
+                    Agricultor agricultor = (Agricultor) in.readObject();
+                    agricultores.add(agricultor); // Agregar agricultor a la lista
+                } catch (EOFException e) {
+                    // Fin del archivo alcanzado
+                    break;
+                } catch (ClassNotFoundException e) {
+                    System.out.println("Error al deserializar un agricultor: " + e.getMessage());
                 }
             }
-            System.out.println("Datos de agricultores cargados correctamente.");
+
+            System.out.println("Datos de agricultores cargados correctamente desde archivo binario.");
         } catch (FileNotFoundException e) {
             System.out.println("Archivo de agricultores no encontrado. Se iniciará con una lista vacía.");
         } catch (IOException e) {
@@ -71,69 +75,54 @@ public class GestionFicheros {
     }
 
     /**
-     * Guarda la lista de máquinas en un archivo de texto llamado
-     * "maquinas.txt". Los datos de cada máquina se almacenan en formato CSV
-     * (ID, tipo, modelo, estado).
+     * Guarda la lista de máquinas en un archivo binario llamado "maquinas.bin".
+     * Los objetos máquinas se guardan individualmente.
      *
-     * @param maquinas La lista de máquinas a guardar en el archivo.
+     * @param maquinas La lista de máquinas a guardar en el archivo binario.
      */
     public static void guardarMaquinasEnArchivo(Lista maquinas) {
-        try (PrintWriter writer = new PrintWriter(new FileWriter("maquinas.txt"))) {
-            // Usamos el iterador para recorrer la lista de máquinas
+        try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream("maquinas.bin"))) {
+            // Usamos un iterador para recorrer la lista y guardar cada máquina
             Iterador<Maquina> iterador = new Iterador<>(maquinas);
-
             while (iterador.hayElemento()) {
                 Maquina maquina = iterador.dameValor();
-                // Guardar ID, tipo (como nombre del enum), modelo y estado (convertido a texto)
-                writer.println(
-                        maquina.getId() + ","
-                        + maquina.getTipoTrabajo().name() + "," // Guardamos el nombre del tipo (enum)
-                        + maquina.getModelo() + ","
-                        + maquina.getEstado().name() // Convertir enum Estado a String
-                );
-                iterador.next(); // Avanzamos al siguiente elemento
+                out.writeObject(maquina); // Escribe cada máquina individualmente
+                iterador.next();
             }
-            System.out.println("Datos de máquinas guardados correctamente.");
+            System.out.println("Datos de máquinas guardados correctamente en archivo binario.");
         } catch (IOException e) {
             System.out.println("Error al guardar los datos de máquinas: " + e.getMessage());
         }
     }
 
     /**
-     * Carga las máquinas desde el archivo "maquinas.txt" y las agrega a la
-     * lista de máquinas. El archivo debe contener los datos en formato CSV (ID,
-     * tipo, modelo, estado).
+     * Carga las máquinas almacenadas en un archivo binario llamado
+     * "maquinas.bin" y las agrega a la lista proporcionada. Los datos previos
+     * en la lista son eliminados.
      *
      * @param maquinas La lista donde se agregarán las máquinas cargadas desde
-     * el archivo.
+     * el archivo binario.
      */
+    @SuppressWarnings("unchecked") // Para evitar advertencias sobre cast
     public static void cargarMaquinasDesdeArchivo(Lista maquinas) {
-        try (BufferedReader reader = new BufferedReader(new FileReader("maquinas.txt"))) {
-            String linea;
-            while ((linea = reader.readLine()) != null) {
-                String[] datos = linea.split(",");
-                if (datos.length == 4) {  // Esperamos 4 datos: id, tipo, modelo, estado
-                    int id = Integer.parseInt(datos[0]);  // Convertir ID a número
-                    String tipoStr = datos[1];  // Tipo como String desde el archivo
-                    String modelo = datos[2];
+        try (ObjectInputStream in = new ObjectInputStream(new FileInputStream("maquinas.bin"))) {
+            // Limpiar la lista actual antes de agregar los elementos cargados
+            maquinas.vaciarLista();
 
-                    // Convertir el tipo a un valor del enum Tipo
-                    try {
-                        Maquina.TipoTrabajo tipo = Maquina.TipoTrabajo.valueOf(tipoStr.toLowerCase());  // Convertir a enum Tipo
-                        // Convertir el estado a un valor del enum Estado
-                        try {
-                            Estado estado = Estado.valueOf(datos[3].toLowerCase());  // Convertir estado
-                            Maquina maquina = new Maquina(id, tipo, modelo, estado);
-                            maquinas.add(maquina); // Agregar la máquina a la lista
-                        } catch (IllegalArgumentException e) {
-                            System.out.println("Estado inválido en el archivo para la máquina con ID " + id + ". Se omitirá esta entrada.");
-                        }
-                    } catch (IllegalArgumentException e) {
-                        System.out.println("Tipo inválido en el archivo para la máquina con ID " + id + ". Se omitirá esta entrada.");
-                    }
+            // Intentamos leer objetos uno por uno hasta que no haya más
+            while (true) {
+                try {
+                    Maquina maquina = (Maquina) in.readObject();
+                    maquinas.add(maquina); // Agregar máquina a la lista
+                } catch (EOFException e) {
+                    // Fin del archivo alcanzado
+                    break;
+                } catch (ClassNotFoundException e) {
+                    System.out.println("Error al deserializar una máquina: " + e.getMessage());
                 }
             }
-            System.out.println("Datos de máquinas cargados correctamente.");
+
+            System.out.println("Datos de máquinas cargados correctamente desde archivo binario.");
         } catch (FileNotFoundException e) {
             System.out.println("Archivo de máquinas no encontrado. Se iniciará con una lista vacía.");
         } catch (IOException e) {
@@ -142,63 +131,54 @@ public class GestionFicheros {
     }
 
     /**
-     * Guarda la lista de parcelas en un archivo de texto llamado
-     * "parcelas.txt". Los datos de cada parcela se almacenan en formato CSV
-     * (ID, ID Agricultor, ubicación, extensión, cultivo).
+     * Guarda la lista de parcelas en un archivo binario llamado "parcelas.bin".
+     * Los objetos parcelas se guardan individualmente.
      *
-     * @param parcelas La lista de parcelas a guardar en el archivo.
+     * @param parcelas La lista de parcelas a guardar en el archivo binario.
      */
     public static void guardarParcelasEnArchivo(Lista parcelas) {
-        try (PrintWriter writer = new PrintWriter(new FileWriter("parcelas.txt"))) {
-            // Usamos el iterador para recorrer la lista de parcelas
+        try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream("parcelas.bin"))) {
+            // Usamos un iterador para recorrer la lista y guardar cada parcela
             Iterador<Parcela> iterador = new Iterador<>(parcelas);
-
             while (iterador.hayElemento()) {
                 Parcela parcela = iterador.dameValor();
-                // Escribimos los datos de la parcela en formato CSV incluyendo el ID del agricultor
-                writer.println(parcela.getId() + "," + parcela.getAgricultor().getId() + ","
-                        + parcela.getUbicacion() + "," + parcela.getExtension() + "," + parcela.getCultivo());
-                iterador.next(); // Avanzamos al siguiente elemento
+                out.writeObject(parcela); // Escribe cada parcela individualmente
+                iterador.next();
             }
-            System.out.println("Datos de parcelas guardados correctamente.");
+            System.out.println("Datos de parcelas guardados correctamente en archivo binario.");
         } catch (IOException e) {
             System.out.println("Error al guardar los datos de parcelas: " + e.getMessage());
         }
     }
 
     /**
-     * Carga las parcelas desde el archivo "parcelas.txt" y las agrega a la
-     * lista de parcelas. El archivo debe contener los datos en formato CSV (ID,
-     * ID Agricultor, ubicación, extensión, cultivo).
+     * Carga las parcelas almacenadas en un archivo binario llamado
+     * "parcelas.bin" y las agrega a la lista proporcionada. Los datos previos
+     * en la lista son eliminados.
      *
      * @param parcelas La lista donde se agregarán las parcelas cargadas desde
-     * el archivo.
+     * el archivo binario.
      */
+    @SuppressWarnings("unchecked") // Para evitar advertencias sobre cast
     public static void cargarParcelasDesdeArchivo(Lista parcelas) {
-        try (BufferedReader reader = new BufferedReader(new FileReader("parcelas.txt"))) {
-            String linea;
-            while ((linea = reader.readLine()) != null) {
-                // Dividimos la línea en partes usando la coma como separador
-                String[] datos = linea.split(",");
-                if (datos.length == 5) { // Validamos que haya exactamente 5 campos
-                    int id = Integer.parseInt(datos[0]);
-                    int idAgricultor = Integer.parseInt(datos[1]);
-                    String ubicacion = datos[2];
-                    double extension = Double.parseDouble(datos[3]);
-                    String cultivo = datos[4];
+        try (ObjectInputStream in = new ObjectInputStream(new FileInputStream("parcelas.bin"))) {
+            // Limpiar la lista actual antes de agregar los elementos cargados
+            parcelas.vaciarLista();
 
-                    // Buscar al agricultor por su ID
-                    Agricultor agricultor = MenuAgricultores.buscarAgricultorPorId(idAgricultor);
-                    if (agricultor != null) {
-                        // Creamos una nueva parcela con los datos leídos
-                        Parcela parcela = new Parcela(id, agricultor, ubicacion, extension, cultivo);
-                        parcelas.add(parcela); // Agregamos la parcela a la lista
-                    } else {
-                        System.out.println("Agricultor con ID " + idAgricultor + " no encontrado. Parcela no cargada.");
-                    }
+            // Intentamos leer objetos uno por uno hasta que no haya más
+            while (true) {
+                try {
+                    Parcela parcela = (Parcela) in.readObject();
+                    parcelas.add(parcela); // Agregar parcela a la lista
+                } catch (EOFException e) {
+                    // Fin del archivo alcanzado
+                    break;
+                } catch (ClassNotFoundException e) {
+                    System.out.println("Error al deserializar una parcela: " + e.getMessage());
                 }
             }
-            System.out.println("Datos de parcelas cargados correctamente.");
+
+            System.out.println("Datos de parcelas cargados correctamente desde archivo binario.");
         } catch (FileNotFoundException e) {
             System.out.println("Archivo de parcelas no encontrado. Se iniciará con una lista vacía.");
         } catch (IOException e) {
@@ -207,117 +187,54 @@ public class GestionFicheros {
     }
 
     /**
-     * Guarda la lista de trabajos en un archivo de texto llamado
-     * "trabajos.txt". Los datos de cada trabajo se almacenan en formato CSV
-     * (ID, ID Parcela, ID Máquina, tipo de trabajo, fecha inicio, fecha fin).
-     * Si alguna de las fechas es nula, se guarda un valor vacío en su lugar.
+     * Guarda la lista de trabajos en un archivo binario llamado "trabajos.bin".
+     * Los objetos trabajos se guardan individualmente.
      *
-     * @param trabajos La lista de trabajos a guardar en el archivo.
+     * @param trabajos La lista de trabajos a guardar en el archivo binario.
      */
     public static void guardarTrabajosEnArchivo(Lista trabajos) {
-        try (PrintWriter writer = new PrintWriter(new FileWriter("trabajos.txt"))) {
-            // Usamos el iterador para recorrer la lista de trabajos
+        try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream("trabajos.bin"))) {
+            // Usamos un iterador para recorrer la lista y guardar cada trabajo
             Iterador<Trabajo> iterador = new Iterador<>(trabajos);
-
             while (iterador.hayElemento()) {
                 Trabajo trabajo = iterador.dameValor();
-
-                // Preparamos las fechas para evitar nulls
-                String fechaInicioStr = trabajo.getFechaInicio() != null ? trabajo.getFechaInicio().toString() : "";
-                String fechaFinStr = trabajo.getFechaFin() != null ? trabajo.getFechaFin().toString() : "";
-
-                // Escribimos los datos del trabajo en formato CSV, incluyendo IDs de parcela y máquina
-                writer.println(
-                        trabajo.getId() + ","
-                        + trabajo.getParcela().getId() + ","
-                        + trabajo.getMaquina().getId() + ","
-                        + trabajo.getTipoTrabajo().name() + "," // Usamos name() para obtener el valor del enum
-                        + fechaInicioStr + ","
-                        + fechaFinStr
-                );
-                iterador.next(); // Avanzamos al siguiente trabajo
+                out.writeObject(trabajo); // Escribe cada trabajo individualmente
+                iterador.next();
             }
-            System.out.println("Datos de trabajos guardados correctamente.");
+            System.out.println("Datos de trabajos guardados correctamente en archivo binario.");
         } catch (IOException e) {
-            // Capturamos cualquier error de entrada/salida y mostramos un mensaje detallado
             System.out.println("Error al guardar los datos de trabajos: " + e.getMessage());
         }
     }
 
     /**
-     * Carga los datos de los trabajos desde un archivo CSV llamado
-     * "trabajos.txt" y los agrega a la lista proporcionada.
-     *
-     * Cada línea del archivo debe contener información sobre un trabajo con los
-     * siguientes campos separados por comas: - ID del trabajo - ID de la
-     * parcela - ID de la máquina - Tipo de trabajo - Fecha de inicio (en
-     * formato "yyyy-MM-dd") - Fecha de fin (en formato "yyyy-MM-dd") - puede
-     * estar vacía
-     *
-     * Los trabajos se añaden a la lista de trabajos solo si los datos son
-     * válidos y las parcelas y máquinas referenciadas existen en el sistema. Si
-     * alguna fecha tiene un formato incorrecto o algún ID de parcela o máquina
-     * no se encuentra, el trabajo se omite y se imprime un mensaje de error.
+     * Carga los trabajos almacenados en un archivo binario llamado
+     * "trabajos.bin" y los agrega a la lista proporcionada. Los datos previos
+     * en la lista son eliminados.
      *
      * @param trabajos La lista donde se agregarán los trabajos cargados desde
-     * el archivo.
+     * el archivo binario.
      */
+    @SuppressWarnings("unchecked") // Para evitar advertencias sobre cast
     public static void cargarTrabajosDesdeArchivo(Lista trabajos) {
-        // Definimos el formato esperado de las fechas
-        DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        try (ObjectInputStream in = new ObjectInputStream(new FileInputStream("trabajos.bin"))) {
+            // Limpiar la lista actual antes de agregar los elementos cargados
+            trabajos.vaciarLista();
 
-        try (BufferedReader reader = new BufferedReader(new FileReader("trabajos.txt"))) {
-            String linea;
-            while ((linea = reader.readLine()) != null) {
-                // Dividimos la línea en partes usando la coma como separador
-                String[] datos = linea.split(",");
-                if (datos.length == 6) { // Se valida que haya exactamente 6 campos
-                    int id = Integer.parseInt(datos[0]);
-                    int parcelaId = Integer.parseInt(datos[1]);
-                    int maquinaId = Integer.parseInt(datos[2]);
-                    String tipoStr = datos[3]; // El tipo se toma como String primero
-                    String fechaInicioStr = datos[4];
-                    String fechaFinStr = datos[5];
-
-                    // Convertimos las fechas de String a LocalDate usando DateTimeFormatter
-                    LocalDate fechaInicio = null;
-                    LocalDate fechaFin = null;
-
-                    try {
-                        if (!fechaInicioStr.isEmpty()) {
-                            fechaInicio = LocalDate.parse(fechaInicioStr, dateFormat);
-                        }
-                        // Solo convertimos fechaFin si no está vacía
-                        if (!fechaFinStr.isEmpty()) {
-                            fechaFin = LocalDate.parse(fechaFinStr, dateFormat);
-                        }
-                    } catch (Exception e) {
-                        System.out.println("Formato de fecha inválido para el trabajo con ID: " + id);
-                        continue; // Pasamos al siguiente trabajo si hay un error de formato en las fechas
-                    }
-
-                    // Buscar parcela y máquina por sus IDs
-                    Parcela parcela = MenuParcelas.buscarParcelaPorId(parcelaId);
-                    Maquina maquina = MenuMaquinas.buscarMaquinaPorId(maquinaId);
-
-                    if (parcela != null && maquina != null) {
-                        // Convertimos el tipo de trabajo de String a tipoAtrabajo (enum)
-                        Maquina.TipoTrabajo tipoTrabajo = null;
-                        try {
-                            tipoTrabajo = Maquina.TipoTrabajo.valueOf(tipoStr); // Convertimos la cadena al enum
-                        } catch (IllegalArgumentException e) {
-                            System.out.println("Tipo de trabajo inválido para el trabajo con ID: " + id);
-                            continue; // Pasamos al siguiente trabajo si el tipo no es válido
-                        }
-
-                        Trabajo trabajo = new Trabajo(id, parcela, maquina, tipoTrabajo, fechaInicio, fechaFin);
-                        trabajos.add(trabajo);
-                    } else {
-                        System.out.println("No se encontró la parcela o la máquina para el trabajo con ID: " + id);
-                    }
+            // Intentamos leer objetos uno por uno hasta que no haya más
+            while (true) {
+                try {
+                    Trabajo trabajo = (Trabajo) in.readObject();
+                    trabajos.add(trabajo); // Agregar trabajo a la lista
+                } catch (EOFException e) {
+                    // Fin del archivo alcanzado
+                    break;
+                } catch (ClassNotFoundException e) {
+                    System.out.println("Error al deserializar un trabajo: " + e.getMessage());
                 }
             }
-            System.out.println("Datos de trabajos cargados correctamente.");
+
+            System.out.println("Datos de trabajos cargados correctamente desde archivo binario.");
         } catch (FileNotFoundException e) {
             System.out.println("Archivo de trabajos no encontrado. Se iniciará con una lista vacía.");
         } catch (IOException e) {

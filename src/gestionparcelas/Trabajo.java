@@ -2,6 +2,7 @@ package gestionparcelas;
 
 import java.time.LocalDate;
 import gestionparcelas.Maquina.TipoTrabajo;
+import java.io.Serializable;
 
 /**
  * Clase que representa un trabajo agrícola. Contiene información sobre la
@@ -11,8 +12,9 @@ import gestionparcelas.Maquina.TipoTrabajo;
  *
  * @author Eduardo Olalde
  */
-public class Trabajo {
-
+public class Trabajo implements Serializable {
+    private static final long serialVersionUID = 1L;
+    
     // Atributos
     private final int id;          // Identificador único del trabajo
     private Parcela parcela;       // Parcela asignada al trabajo

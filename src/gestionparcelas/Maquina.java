@@ -1,5 +1,7 @@
 package gestionparcelas;
 
+import java.io.Serializable;
+
 /**
  * Clase que representa una máquina agrícola. Cada máquina tiene un ID único, un
  * tipo (como tractor, cosechadora), un modelo y un estado que refleja su
@@ -9,8 +11,9 @@ package gestionparcelas;
  *
  * @author Eduardo Olalde
  */
-public class Maquina {
-
+public class Maquina implements Serializable {
+    private static final long serialVersionUID = 1L;
+    
     // Enumeración que define los posibles estados de una máquina.
     public enum Estado {
         libre, // La máquina está disponible para ser asignada.

@@ -56,25 +56,27 @@ public class MenuAgricultores {
      * archivo correspondiente.
      */
     private static void altaAgricultor() {
-        // Generar un nuevo ID automático tomando el último ID + 1
+        // Generar un nuevo ID automático tomando el mayor ID existente + 1
         int nuevoId = 1;
+        
         Iterador<Agricultor> iterador = new Iterador<>(agricultores);
-        if (iterador.hayElemento()) {
-            while (iterador.hayElemento()) {
-                Agricultor agricultor = iterador.dameValor();
+        while (iterador.hayElemento()) {
+            Agricultor agricultor = iterador.dameValor();
+            
+            if (agricultor.getId() >= nuevoId) {
                 nuevoId = agricultor.getId() + 1;
-                iterador.next();
             }
+            iterador.next();
         }
-
+       
         System.out.println("\n--- Alta de Agricultor ---");
         String nombre = leerCadena("Nombre del agricultor: ");
         String password = leerCadena("Password del agricultor: ");
-
+       
         Agricultor agricultor = new Agricultor(nuevoId, nombre, password);
-
-        agricultores.add(agricultor);
-        guardarAgricultoresEnArchivo(agricultores);
+       
+        agricultores.add(agricultor);       
+        guardarAgricultoresEnArchivo(agricultores);     
         System.out.println("Agricultor añadido correctamente con ID: " + nuevoId);
     }
 

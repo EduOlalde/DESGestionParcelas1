@@ -124,7 +124,6 @@ public class GestionParcelas {
      */
     public static LocalDate leerFecha(String mensaje) {
         LocalDate fecha = null;
-        Scanner scanner = new Scanner(System.in);
 
         while (fecha == null) {
             System.out.print(mensaje);

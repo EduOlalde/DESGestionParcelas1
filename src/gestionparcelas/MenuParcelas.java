@@ -58,15 +58,17 @@ public class MenuParcelas {
      * archivo correspondiente.
      */
     private static void altaParcela() {
-        // Generar un nuevo ID automático tomando el último ID + 1
+        // Generar un nuevo ID automático tomando el mayor ID existente + 1
         int nuevoId = 1;
-        Iterador<Parcela> iter = new Iterador<>(parcelas);
-        while (iter.hasNext()) {
-            iter.next();  // Avanzamos hasta el final
-        }
-
-        if (iter.hayElemento()) {
-            nuevoId = iter.dameValor().getId() + 1;
+        
+        Iterador<Parcela> iterador = new Iterador<>(parcelas);
+        while (iterador.hayElemento()) {
+            Parcela parcela = iterador.dameValor();
+            
+            if (parcela.getId() >= nuevoId) {
+                nuevoId = parcela.getId() + 1;
+            }
+            iterador.next();
         }
 
         System.out.println("Alta de parcela:");

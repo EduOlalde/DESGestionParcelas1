@@ -1,5 +1,7 @@
 package gestionparcelas;
 
+import java.io.Serializable;
+
 /**
  * Clase que representa un agricultor. Esta clase contiene los atributos
  * necesarios para gestionar a los agricultores, como su identificador, nombre y
@@ -9,7 +11,9 @@ package gestionparcelas;
  *
  * @autor Eduardo Olalde
  */
-public class Agricultor {
+public class Agricultor implements Serializable {
+    
+    private static final long serialVersionUID = 1L;
 
     private final int id;       // Identificador único del agricultor
     private String nombre;      // Nombre del agricultor

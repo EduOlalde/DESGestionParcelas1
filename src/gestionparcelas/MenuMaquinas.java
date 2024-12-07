@@ -63,17 +63,19 @@ public class MenuMaquinas {
      * correspondiente.
      */
     private static void altaMaquina() {
-        // Generar un nuevo ID automático tomando el último ID + 1
+        // Generar un nuevo ID automático tomando el mayor ID existente + 1
         int nuevoId = 1;
-        Iterador<Maquina> iter = new Iterador<>(maquinas);
-        while (iter.hayElemento()) {
-            iter.next();  // Avanzamos hasta el final
+        
+        Iterador<Maquina> iterador = new Iterador<>(maquinas);
+        while (iterador.hayElemento()) {
+            Maquina maquina = iterador.dameValor();
+            
+            if (maquina.getId() >= nuevoId) {
+                nuevoId = maquina.getId() + 1;
+            }
+            iterador.next();
         }
-
-        if (iter.hayElemento()) {
-            nuevoId = iter.dameValor().getId() + 1;
-        }
-
+              
         System.out.println("Alta de máquina:");
         System.out.println("Tipos de máquinas disponibles:");
         for (TipoTrabajo tipo : TipoTrabajo.values()) {
