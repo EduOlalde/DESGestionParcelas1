@@ -2,8 +2,7 @@ package gestionparcelas;
 
 import ListasTemplates.*;
 import static gestionparcelas.GestionFicheros.guardarMaquinasEnArchivo;
-import static gestionparcelas.GestionParcelas.leerCadena;
-import static gestionparcelas.GestionParcelas.leerEntero;
+import static gestionparcelas.EntradaDatos.*;
 import static gestionparcelas.GestionParcelas.maquinas;
 import gestionparcelas.Maquina.Estado;
 import gestionparcelas.Maquina.TipoTrabajo;

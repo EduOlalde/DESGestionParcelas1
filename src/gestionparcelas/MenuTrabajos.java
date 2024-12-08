@@ -3,18 +3,15 @@ package gestionparcelas;
 import ListasTemplates.*;
 import static gestionparcelas.GestionFicheros.guardarTrabajosEnArchivo;
 import static gestionparcelas.GestionFicheros.guardarMaquinasEnArchivo;
-import static gestionparcelas.GestionParcelas.leerEntero;
-import static gestionparcelas.GestionParcelas.leerFecha;
-import static gestionparcelas.GestionParcelas.parcelas;
-import static gestionparcelas.GestionParcelas.trabajos;
-import static gestionparcelas.GestionParcelas.maquinas;
+import static gestionparcelas.EntradaDatos.*;
+import static gestionparcelas.GestionParcelas.*;
 import static gestionparcelas.MenuParcelas.buscarParcelaPorId;
 import gestionparcelas.Maquina.Estado;
 import gestionparcelas.Maquina.TipoTrabajo;
 import java.time.LocalDate;
 
 /**
- * Esta clase gestiona las operaciones relacionadas con los trabajos en el
+ * Clase que gestiona las operaciones relacionadas con los trabajos en el
  * sistema. Permite asignar, finalizar y listar los trabajos realizados en las
  * parcelas, así como gestionar el estado de las máquinas asignadas a los
  * trabajos.

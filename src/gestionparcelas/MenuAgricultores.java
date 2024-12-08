@@ -2,8 +2,7 @@ package gestionparcelas;
 
 import ListasTemplates.*;
 import static gestionparcelas.GestionFicheros.guardarAgricultoresEnArchivo;
-import static gestionparcelas.GestionParcelas.leerCadena;
-import static gestionparcelas.GestionParcelas.leerEntero;
+import static gestionparcelas.EntradaDatos.*;
 import static gestionparcelas.GestionParcelas.agricultores;
 
 /**

@@ -2,9 +2,7 @@ package gestionparcelas;
 
 import ListasTemplates.*;
 import static gestionparcelas.GestionFicheros.guardarParcelasEnArchivo;
-import static gestionparcelas.GestionParcelas.leerCadena;
-import static gestionparcelas.GestionParcelas.leerEntero;
-import static gestionparcelas.GestionParcelas.leerReal;
+import static gestionparcelas.EntradaDatos.*;
 import static gestionparcelas.GestionParcelas.parcelas;
 
 /**
