@@ -1,5 +1,8 @@
 build/
-/dist/
-agricultores.txt
-maquinas.txt
-parcelas.txt
+dist/
+agricultores
+maquinas
+parcelas
+trabajos
+nbproject/
+!project.xml
