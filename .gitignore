@@ -1,8 +1,8 @@
 build/
 dist/
-agricultores
-maquinas
-parcelas
-trabajos
+agricultores*
+maquinas*
+parcelas*
+trabajos*
 nbproject/
 !project.xml
