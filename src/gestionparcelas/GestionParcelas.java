@@ -21,7 +21,10 @@ public class GestionParcelas {
     public static Lista<Maquina> maquinas = new Lista<>();
     public static Lista<Parcela> parcelas = new Lista<>();
     public static Lista<Trabajo> trabajos = new Lista<>();
-    public static Cola<Maquina> maquinasLibres = new Cola<>();
+    public static Cola<Maquina> mArarLibres = new Cola<>();
+    public static Cola<Maquina> mCosecharLibres = new Cola<>();
+    public static Cola<Maquina> mSembrarLibres = new Cola<>();
+    public static Cola<Maquina> mFumigarLibres = new Cola<>();
 
     /**
      * Método principal de la aplicación. Carga los datos de agricultores,
@@ -37,6 +40,11 @@ public class GestionParcelas {
         cargarMaquinasDesdeArchivo(maquinas);
         cargarParcelasDesdeArchivo(parcelas);
         cargarTrabajosDesdeArchivo(trabajos);
+        // Encola las máquinas disponibles en sus respectivas colas
+        MenuMaquinas.encolarMaquinasLibres(maquinas, mArarLibres, Maquina.TipoTrabajo.arar);
+        MenuMaquinas.encolarMaquinasLibres(maquinas, mCosecharLibres, Maquina.TipoTrabajo.cosechar);
+        MenuMaquinas.encolarMaquinasLibres(maquinas, mSembrarLibres, Maquina.TipoTrabajo.sembrar);
+        MenuMaquinas.encolarMaquinasLibres(maquinas, mFumigarLibres, Maquina.TipoTrabajo.fumigar);
 
         // Menú principal
         boolean salir = false;

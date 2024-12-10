@@ -144,7 +144,7 @@ public class MenuMaquinas {
                 for (TipoTrabajo tipo : TipoTrabajo.values()) {
                     System.out.println(tipo.ordinal() + 1 + ". " + tipo.name());
                 }
-               
+
                 int tipoTrabajoSeleccionado = leerEntero("Ingrese el número del nuevo tipo de trabajo: ");
 
                 // Validar que la opción esté en el rango de tipos disponibles
@@ -155,28 +155,28 @@ public class MenuMaquinas {
 
                 // Convertir la selección en un valor del enum TipoTrabajo
                 TipoTrabajo tipo = TipoTrabajo.values()[tipoTrabajoSeleccionado - 1];
-               
+
                 System.out.println("Estados disponibles: ");
                 for (Estado estado : Estado.values()) {
                     System.out.println(estado.ordinal() + 1 + ". " + estado.name());
                 }
-                
+
                 // Leer la opción del estado
                 int tipoEstadoSeleccionado = leerEntero("Ingrese el número del nuevo estado: ");
-                
+
                 // Validar que la opción esté en el rango de tipos disponibles
-                if (tipoEstadoSeleccionado < 1 || tipoEstadoSeleccionado > Estado.values().length){
+                if (tipoEstadoSeleccionado < 1 || tipoEstadoSeleccionado > Estado.values().length) {
                     System.out.println("Opción no válida. Inténtelo de nuevo.");
                     return;
                 }
-                
+
                 // Convertir la selección en un valor del enum Estado
-                Estado estado = Estado.values()[tipoEstadoSeleccionado - 1];           
-                
+                Estado estado = Estado.values()[tipoEstadoSeleccionado - 1];
+
                 maquina.setModelo(leerCadena("Nuevo modelo: "));
                 maquina.setTipoTrabajo(tipo);
                 maquina.setEstado(estado);
-                
+
                 System.out.println("Máquina modificada correctamente.");
                 guardarMaquinasEnArchivo(maquinas);
                 return;
@@ -259,4 +259,27 @@ public class MenuMaquinas {
         }
         return null;
     }
+
+    /**
+     * Método que agrega a la cola todas las máquinas libres de un TipoTrabajo
+     * específico.
+     *
+     * @param listaMaquinas La lista de máquinas de la cual se seleccionarán las
+     * máquinas.
+     * @param cola La cola donde se agregarán las máquinas.
+     * @param tipoTrabajo El tipo de trabajo por el cual filtrar las máquinas.
+     */
+    public static void encolarMaquinasLibres(Lista<Maquina> listaMaquinas, Cola<Maquina> cola, Maquina.TipoTrabajo tipoTrabajo) {
+        Nodo<Maquina> nodoActual = listaMaquinas.getNodoInicial();
+
+        while (nodoActual != null) {
+            Maquina maquina = nodoActual.getInf();
+            // Verifica que la máquina sea del tipo especificado y esté libre
+            if (maquina != null && maquina.getTipoTrabajo() == tipoTrabajo && maquina.getEstado() == Maquina.Estado.libre) {
+                cola.encolar(maquina);
+            }
+            nodoActual = nodoActual.getSig();
+        }
+    }
+
 }
