@@ -3,6 +3,7 @@ package gestionparcelas;
 import ListasTemplates.*;
 import static gestionparcelas.GestionFicheros.*;
 import static gestionparcelas.EntradaDatos.*;
+import static gestionparcelas.Maquina.*;
 
 /**
  * Clase principal que gestiona la aplicación de gestión de parcelas. Esta clase
@@ -68,7 +69,7 @@ public class GestionParcelas {
                 case 5:
                     listarDatos();
                     break;
-                case 6: 
+                case 6:
                     salir = true;
                     System.out.println("¡Hasta luego!");
                     break;

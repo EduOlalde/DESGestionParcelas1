@@ -3,7 +3,7 @@ package gestionparcelas;
 import ListasTemplates.*;
 import static gestionparcelas.GestionFicheros.guardarMaquinasEnArchivo;
 import static gestionparcelas.EntradaDatos.*;
-import static gestionparcelas.GestionParcelas.maquinas;
+import static gestionparcelas.GestionParcelas.*;
 import gestionparcelas.Maquina.Estado;
 import gestionparcelas.Maquina.TipoTrabajo;
 
@@ -65,7 +65,7 @@ public class MenuMaquinas {
      * Permite dar de alta una nueva máquina. Se solicita el tipo y modelo de la
      * máquina, y se asigna un estado inicial como "libre". La máquina se añade
      * a la lista de máquinas y la lista se guarda en el archivo
-     * correspondiente.
+     * correspondiente. Luego, se actualizan las colas de máquinas libres.
      */
     private static void altaMaquina() {
         // Generar un nuevo ID automático tomando el mayor ID existente + 1
@@ -74,7 +74,6 @@ public class MenuMaquinas {
         Iterador<Maquina> iterador = new Iterador<>(maquinas);
         while (iterador.hayElemento()) {
             Maquina maquina = iterador.dameValor();
-
             if (maquina.getId() >= nuevoId) {
                 nuevoId = maquina.getId() + 1;
             }
@@ -89,22 +88,22 @@ public class MenuMaquinas {
 
         int tipoTrabajoSeleccionado = leerEntero("Ingrese el número del tipo de trabajo: ");
 
-        // Validar que la opción esté en el rango de tipos disponibles
         if (tipoTrabajoSeleccionado < 1 || tipoTrabajoSeleccionado > TipoTrabajo.values().length) {
             System.out.println("Opción no válida. Inténtelo de nuevo.");
             return;
         }
 
-        // Convertir la selección en un valor del enum TipoTrabajo
         TipoTrabajo tipoTrabajo = TipoTrabajo.values()[tipoTrabajoSeleccionado - 1];
-
         String modelo = leerCadena("Modelo de máquina: ");
         Estado estado = Estado.libre;
 
         Maquina nuevaMaquina = new Maquina(nuevoId, tipoTrabajo, modelo, estado);
 
         maquinas.add(nuevaMaquina);
+
+        // Guardar cambios y actualizar las colas
         guardarMaquinasEnArchivo(maquinas);
+        actualizarCola(nuevaMaquina, "alta");
 
         System.out.println("Máquina añadida correctamente con ID: " + nuevoId);
     }
@@ -112,7 +111,7 @@ public class MenuMaquinas {
     /**
      * Permite eliminar una máquina existente. Se solicita el ID de la máquina a
      * eliminar y, si se encuentra en la lista, se elimina. La lista se guarda
-     * después de la eliminación.
+     * después de la eliminación y se actualizan las colas
      */
     private static void bajaMaquina() {
         System.out.println("Baja de máquina:");
@@ -121,6 +120,7 @@ public class MenuMaquinas {
 
         if (maquinas.borrarTodos(temp)) {
             guardarMaquinasEnArchivo(maquinas);
+            actualizarCola(temp, "baja");
             System.out.println("Máquina eliminada correctamente.");
         } else {
             System.out.println("Máquina no encontrada.");
@@ -131,7 +131,7 @@ public class MenuMaquinas {
      * Permite modificar los datos de una máquina existente. Se solicita el ID
      * de la máquina a modificar, y si se encuentra, se actualizan los campos
      * como el tipo, modelo y estado. La lista de máquinas se guarda después de
-     * la modificación.
+     * la modificación y se actualizan las colas.
      */
     private static void modificarMaquina() {
         int id = leerEntero("ID de la máquina a modificar: ");
@@ -179,6 +179,8 @@ public class MenuMaquinas {
 
                 System.out.println("Máquina modificada correctamente.");
                 guardarMaquinasEnArchivo(maquinas);
+                actualizarCola(maquina, "baja");
+                actualizarCola(maquina, "alta");
                 return;
             }
             iter.next();
@@ -279,6 +281,84 @@ public class MenuMaquinas {
                 cola.encolar(maquina);
             }
             nodoActual = nodoActual.getSig();
+        }
+    }
+
+    /**
+     * Actualiza la cola de máquinas libres correspondiente al tipo de trabajo
+     * de la máquina especificada. La cola se actualiza según la acción indicada
+     * (alta o baja).
+     *
+     * @param maquina La máquina cuya cola de tipo de trabajo se debe
+     * actualizar.
+     * @param accion La acción a realizar: "alta" para encolar, "baja" para
+     * eliminar.
+     */
+    private static void actualizarCola(Maquina maquina, String accion) {
+        if (maquina == null) {
+            System.out.println("La máquina proporcionada es nula.");
+            return;
+        }
+
+        // Identificar la cola correspondiente al tipo de trabajo de la máquina
+        Cola<Maquina> colaActualizar;
+        switch (maquina.getTipoTrabajo()) {
+            case arar:
+                colaActualizar = mArarLibres;
+                break;
+            case cosechar:
+                colaActualizar = mCosecharLibres;
+                break;
+            case sembrar:
+                colaActualizar = mSembrarLibres;
+                break;
+            case fumigar:
+                colaActualizar = mFumigarLibres;
+                break;
+            default:
+                System.out.println("Tipo de trabajo no válido para la máquina.");
+                return;
+        }
+
+        // Realizar la acción solicitada
+        switch (accion.toLowerCase()) {
+            case "alta":
+                // Encolar la máquina si está libre
+                if (maquina.getEstado() == Estado.libre) {
+                    colaActualizar.encolar(maquina);
+                    System.out.println("Máquina " + maquina.getId() + " añadida a la cola de tipo " + maquina.getTipoTrabajo());
+                } else {
+                    System.out.println("La máquina no está libre para ser añadida.");
+                }
+                break;
+
+            case "baja":
+                // Eliminar la máquina de la cola
+                Cola<Maquina> tempCola = new Cola<>();
+                boolean maquinaEliminada = false;
+
+                // Transferir todas las máquinas excepto la que se va a eliminar
+                while (!colaActualizar.esVacia()) {
+                    Maquina m = colaActualizar.desencolar();
+                    if (m.getId() != maquina.getId()) {
+                        tempCola.encolar(m);
+                    } else {
+                        maquinaEliminada = true;
+                    }
+                }
+
+                // Si la máquina fue eliminada, actualizar la cola
+                if (maquinaEliminada) {
+                    colaActualizar = tempCola;
+                    System.out.println("Máquina " + maquina.getId() + " eliminada de la cola de tipo " + maquina.getTipoTrabajo());
+                } else {
+                    System.out.println("Máquina con ID " + maquina.getId() + " no encontrada en la cola.");
+                }
+                break;
+
+            default:
+                System.out.println("Acción no válida. Use 'alta' o 'baja'.");
+                break;
         }
     }
 
