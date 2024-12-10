@@ -7,3 +7,4 @@ trabajos*
 nbproject/
 !project.xml
 libraries/ListasTemplates/
+nbproject/private/
