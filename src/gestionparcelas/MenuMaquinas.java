@@ -37,19 +37,25 @@ public class MenuMaquinas {
             int opcion = leerEntero("Selecciona una opción: ");
 
             switch (opcion) {
-                case 1 ->
+                case 1:
                     altaMaquina();
-                case 2 ->
+                    break;
+                case 2:
                     bajaMaquina();
-                case 3 ->
+                    break;
+                case 3:
                     modificarMaquina();
-                case 4 ->
+                    break;
+                case 4:
                     listarMaquinas();
-                case 5 ->
+                    break;
+                case 5:
                     listarMaquinasLibres();
-                case 6 ->
+                    break;
+                case 6:
                     salir = true;
-                default ->
+                    break;
+                default:
                     System.out.println("Opción no válida. Intente nuevamente.");
             }
         }

@@ -45,21 +45,26 @@ public class GestionParcelas {
             int opcion = leerEntero("Selecciona una opción: ");
 
             switch (opcion) {
-                case 1 ->
+                case 1:
                     MenuAgricultores.mostrarMenu();
-                case 2 ->
+                    break;
+                case 2:
                     MenuMaquinas.mostrarMenu();
-                case 3 ->
+                    break;
+                case 3:
                     MenuParcelas.mostrarMenu();
-                case 4 ->
+                    break;
+                case 4:
                     MenuTrabajos.mostrarMenu();
-                case 5 ->
+                    break;
+                case 5:
                     listarDatos();
-                case 6 -> {
+                    break;
+                case 6: 
                     salir = true;
                     System.out.println("¡Hasta luego!");
-                }
-                default ->
+                    break;
+                default:
                     System.out.println("Opción no válida.");
             }
         }

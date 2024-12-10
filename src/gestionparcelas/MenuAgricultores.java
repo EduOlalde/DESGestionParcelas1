@@ -32,17 +32,22 @@ public class MenuAgricultores {
             int opcion = leerEntero("Selecciona una opción: ");
 
             switch (opcion) {
-                case 1 ->
+                case 1:
                     altaAgricultor();
-                case 2 ->
+                    break;
+                case 2:
                     bajaAgricultor();
-                case 3 ->
+                    break;
+                case 3:
                     modificarAgricultor();
-                case 4 ->
+                    break;
+                case 4:
                     listarAgricultores();
-                case 5 ->
+                    break;
+                case 5:
                     salir = true;
-                default ->
+                    break;
+                default:
                     System.out.println("Opción no válida. Intente nuevamente.");
             }
         }

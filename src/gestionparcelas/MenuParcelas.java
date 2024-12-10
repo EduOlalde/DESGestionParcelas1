@@ -33,17 +33,22 @@ public class MenuParcelas {
             int opcion = leerEntero("Selecciona una opción: ");
 
             switch (opcion) {
-                case 1 ->
+                case 1:
                     altaParcela();
-                case 2 ->
+                    break;
+                case 2:
                     bajaParcela();
-                case 3 ->
+                    break;
+                case 3:
                     modificarParcela();
-                case 4 ->
+                    break;
+                case 4:
                     listarParcelas();
-                case 5 ->
+                    break;
+                case 5:
                     salir = true;
-                default ->
+                    break;
+                default:
                     System.out.println("Opción no válida. Intente nuevamente.");
             }
         }

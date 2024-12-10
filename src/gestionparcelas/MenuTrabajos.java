@@ -41,15 +41,19 @@ public class MenuTrabajos {
             int opcionTrabajo = leerEntero("Selecciona una opción para gestionar los trabajos: ");
 
             switch (opcionTrabajo) {
-                case 1 ->
+                case 1:
                     asignarTrabajo();
-                case 2 ->
+                    break;
+                case 2:
                     finalizarTrabajo();
-                case 3 ->
+                    break;
+                case 3:
                     listarTrabajos();
-                case 4 ->
+                    break;
+                case 4:
                     salir = true;
-                default ->
+                    break;
+                default:
                     System.out.println("Opción no válida. Por favor, selecciona una opción válida.");
             }
         }
