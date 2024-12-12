@@ -3,7 +3,6 @@ package gestionparcelas;
 import ListasTemplates.*;
 import static gestionparcelas.GestionFicheros.*;
 import static gestionparcelas.EntradaDatos.*;
-import static gestionparcelas.Maquina.*;
 
 /**
  * Clase principal que gestiona la aplicación de gestión de parcelas. Esta clase
@@ -37,10 +36,10 @@ public class GestionParcelas {
      */
     public static void main(String[] args) {
         // Cargar datos al inicio
-        cargarAgricultoresDesdeArchivo(agricultores);
-        cargarMaquinasDesdeArchivo(maquinas);
-        cargarParcelasDesdeArchivo(parcelas);
-        cargarTrabajosDesdeArchivo(trabajos);
+        cargarDesdeArchivo(agricultores, "agricultores.bin", Agricultor.class);
+        cargarDesdeArchivo(maquinas, "maquinas.bin", Maquina.class);
+        cargarDesdeArchivo(parcelas, "parcelas.bin", Parcela.class);
+        cargarDesdeArchivo(trabajos, "trabajos.bin", Trabajo.class);
         // Encola las máquinas disponibles en sus respectivas colas
         MenuMaquinas.encolarMaquinasLibres(maquinas, mArarLibres, Maquina.TipoTrabajo.arar);
         MenuMaquinas.encolarMaquinasLibres(maquinas, mCosecharLibres, Maquina.TipoTrabajo.cosechar);

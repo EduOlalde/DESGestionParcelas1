@@ -1,12 +1,10 @@
 package gestionparcelas;
 
 import ListasTemplates.*;
-import static gestionparcelas.GestionFicheros.guardarTrabajosEnArchivo;
-import static gestionparcelas.GestionFicheros.guardarMaquinasEnArchivo;
+import static gestionparcelas.GestionFicheros.guardarEnArchivo;
 import static gestionparcelas.EntradaDatos.*;
 import static gestionparcelas.GestionParcelas.*;
 import static gestionparcelas.MenuParcelas.buscarParcelaPorId;
-import gestionparcelas.Maquina.Estado;
 import java.time.LocalDate;
 
 /**
@@ -153,8 +151,8 @@ public class MenuTrabajos {
         System.out.println("Trabajo creado:");
         System.out.println(trabajo.toString());
 
-        guardarTrabajosEnArchivo(trabajos);
-        guardarMaquinasEnArchivo(maquinas);
+        guardarEnArchivo(trabajos, "trabajos");
+        guardarEnArchivo(maquinas, "maquinas");
     }
 
     /**
@@ -240,8 +238,8 @@ public class MenuTrabajos {
             System.out.println("Trabajo con ID " + idTrabajo + " no encontrado o ya finalizado.");
         }
 
-        guardarTrabajosEnArchivo(trabajos);
-        guardarMaquinasEnArchivo(maquinas);
+        guardarEnArchivo(trabajos, "trabajos");
+        guardarEnArchivo(maquinas, "maquinas");
     }
 
     /**

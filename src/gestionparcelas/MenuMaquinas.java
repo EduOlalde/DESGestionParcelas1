@@ -1,7 +1,7 @@
 package gestionparcelas;
 
 import ListasTemplates.*;
-import static gestionparcelas.GestionFicheros.guardarMaquinasEnArchivo;
+import static gestionparcelas.GestionFicheros.guardarEnArchivo;
 import static gestionparcelas.EntradaDatos.*;
 import static gestionparcelas.GestionParcelas.*;
 import gestionparcelas.Maquina.Estado;
@@ -102,7 +102,7 @@ public class MenuMaquinas {
         maquinas.add(nuevaMaquina);
 
         // Guardar cambios y actualizar las colas
-        guardarMaquinasEnArchivo(maquinas);
+        guardarEnArchivo(maquinas, "maquinas.bin");
         actualizarCola(nuevaMaquina, "alta");
 
         System.out.println("Máquina añadida correctamente con ID: " + nuevoId);
@@ -119,7 +119,7 @@ public class MenuMaquinas {
         Maquina temp = new Maquina(id, TipoTrabajo.arar, "", Estado.libre); // Tipo genérico para búsqueda
 
         if (maquinas.borrarTodos(temp)) {
-            guardarMaquinasEnArchivo(maquinas);
+            guardarEnArchivo(maquinas, "maquinas");
             actualizarCola(temp, "baja");
             System.out.println("Máquina eliminada correctamente.");
         } else {
@@ -178,7 +178,7 @@ public class MenuMaquinas {
                 maquina.setEstado(estado);
 
                 System.out.println("Máquina modificada correctamente.");
-                guardarMaquinasEnArchivo(maquinas);
+                guardarEnArchivo(maquinas, "maquinas");
                 actualizarCola(maquina, "baja");
                 actualizarCola(maquina, "alta");
                 return;

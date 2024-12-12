@@ -1,7 +1,7 @@
 package gestionparcelas;
 
 import ListasTemplates.*;
-import static gestionparcelas.GestionFicheros.guardarAgricultoresEnArchivo;
+import static gestionparcelas.GestionFicheros.guardarEnArchivo;
 import static gestionparcelas.EntradaDatos.*;
 import static gestionparcelas.GestionParcelas.agricultores;
 
@@ -80,7 +80,7 @@ public class MenuAgricultores {
         Agricultor agricultor = new Agricultor(nuevoId, nombre, password);
        
         agricultores.add(agricultor);       
-        guardarAgricultoresEnArchivo(agricultores);     
+        guardarEnArchivo(agricultores, "agricultores");     
         System.out.println("Agricultor añadido correctamente con ID: " + nuevoId);
     }
 
@@ -95,7 +95,7 @@ public class MenuAgricultores {
         Agricultor temp = new Agricultor(id, "", "");
 
         if (agricultores.borrarTodos(temp)) {
-            guardarAgricultoresEnArchivo(agricultores);
+            guardarEnArchivo(agricultores, "agricultores");  
             System.out.println("Agricultor eliminado correctamente.");
         } else {
             System.out.println("Agricultor no encontrado.");
@@ -117,7 +117,7 @@ public class MenuAgricultores {
                 agricultor.setNombre(leerCadena("Nuevo nombre: "));
                 agricultor.setPassword(leerCadena("Nueva password: "));
                 System.out.println("Agricultor modificado correctamente.");
-                guardarAgricultoresEnArchivo(agricultores);
+                guardarEnArchivo(agricultores, "agricultores");  
                 return;
             }
             iterador.next();

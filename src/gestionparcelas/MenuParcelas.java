@@ -1,7 +1,7 @@
 package gestionparcelas;
 
 import ListasTemplates.*;
-import static gestionparcelas.GestionFicheros.guardarParcelasEnArchivo;
+import static gestionparcelas.GestionFicheros.guardarEnArchivo;
 import static gestionparcelas.EntradaDatos.*;
 import static gestionparcelas.GestionParcelas.parcelas;
 
@@ -84,7 +84,7 @@ public class MenuParcelas {
         Parcela parcela = new Parcela(nuevoId, agricultor, ubicacion, extension, cultivo);
 
         parcelas.add(parcela);
-        guardarParcelasEnArchivo(parcelas);
+        guardarEnArchivo(parcelas, "parcelas");
         System.out.println("Parcela añadida correctamente.");
     }
 
@@ -99,7 +99,7 @@ public class MenuParcelas {
         Parcela temp = new Parcela(id, null, "", 0, "");
 
         if (parcelas.borrarTodos(temp)) {
-            guardarParcelasEnArchivo(parcelas);
+            guardarEnArchivo(parcelas, "parcelas");
             System.out.println("Parcela eliminada correctamente.");
         } else {
             System.out.println("Parcela no encontrada.");
@@ -122,7 +122,7 @@ public class MenuParcelas {
                 parcela.setExtension(leerReal("Nueva extensión (en hectáreas): "));
                 parcela.setCultivo(leerCadena("Nuevo cultivo: "));
                 System.out.println("Parcela modificada correctamente.");
-                guardarParcelasEnArchivo(parcelas);
+                guardarEnArchivo(parcelas, "parcelas");
                 return;
             }
             iter.next();

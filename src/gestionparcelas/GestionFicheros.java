@@ -4,242 +4,97 @@ import ListasTemplates.*;
 import java.io.*;
 
 /**
- * Clase encargada de gestionar la lectura y escritura de datos de agricultores,
- * máquinas, parcelas y trabajos en archivos de texto. Utiliza la clase
- * {@link Iterador} para recorrer las listas de objetos y guardar/cargar datos
- * en formato CSV.
+ * Clase que proporciona métodos genéricos para guardar y cargar listas de
+ * objetos en archivos binarios. Permite trabajar con cualquier tipo de objeto
+ * siempre que estos implementen la interfaz Serializable.
  *
- * Los métodos de esta clase permiten guardar los datos en archivos o cargarlos
- * desde archivos, para persistir información relevante sobre agricultores,
- * máquinas, parcelas y trabajos.
+ * <p>
+ * Los métodos están diseñados para ser reutilizables, utilizando genéricos para
+ * manejar listas de diferentes tipos de objetos.</p>
  *
  * @author Eduardo Olalde
  */
 public class GestionFicheros {
 
     /**
-     * Guarda la lista de agricultores en un archivo binario llamado
-     * "agricultores.bin". Los objetos agricultores se guardan individualmente.
+     * Guarda una lista de objetos en un archivo binario.
      *
-     * @param agricultores La lista de agricultores a guardar en el archivo
-     * binario.
+     * <p>
+     * Este método verifica que todos los objetos en la lista sean serializables
+     * antes de escribirlos en el archivo.</p>
+     *
+     * @param <T> El tipo de los objetos contenidos en la lista.
+     * @param lista La lista de objetos a guardar.
+     * @param nombreArchivo El nombre del archivo en el que se guardarán los
+     * datos.
+     * @throws IllegalArgumentException Si alguno de los objetos no es
+     * serializable.
      */
-    public static void guardarAgricultoresEnArchivo(Lista agricultores) {
-        try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream("agricultores.bin"))) {
-            
-            Iterador<Agricultor> iterador = new Iterador<>(agricultores);
+    public static <T> void guardarEnArchivo(Lista<T> lista, String nombreArchivo) {
+        try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(nombreArchivo))) {
+            Iterador<T> iterador = new Iterador<>(lista);
+
             while (iterador.hayElemento()) {
-                Agricultor agricultor = iterador.dameValor();
-                out.writeObject(agricultor); // Escribe cada agricultor individualmente
+                T objeto = iterador.dameValor();
+
+                // Verificar si el objeto es serializable
+                if (!(objeto instanceof Serializable)) {
+                    throw new IllegalArgumentException("El objeto " + objeto + " no es serializable.");
+                }
+
+                // Escribir el objeto en el archivo
+                out.writeObject(objeto);
                 iterador.next();
             }
-            System.out.println("Datos de agricultores guardados correctamente.");
+
+            System.out.println("Datos guardados correctamente en " + nombreArchivo + ".");
         } catch (IOException e) {
-            System.out.println("Error al guardar los datos de agricultores: " + e.getMessage());
+            System.out.println("Error al guardar datos: " + e.getMessage());
         }
     }
 
     /**
-     * Carga los agricultores almacenados en un archivo binario llamado
-     * "agricultores.bin" y los agrega a la lista proporcionada. Los datos
-     * previos en la lista son eliminados.
+     * Carga una lista de objetos desde un archivo binario.
      *
-     * @param agricultores La lista donde se agregarán los agricultores cargados
-     * desde el archivo binario.
+     * <p>
+     * El método vacía la lista antes de cargar los datos desde el archivo y
+     * verifica que los objetos leídos coincidan con el tipo esperado.</p>
+     *
+     * @param <T> El tipo de los objetos que se espera cargar.
+     * @param lista La lista en la que se cargarán los datos.
+     * @param nombreArchivo El nombre del archivo desde el que se cargarán los
+     * datos.
+     * @param claseEsperada La clase de los objetos que se espera cargar.
      */
-    @SuppressWarnings("unchecked") // Para evitar advertencias sobre cast
-    public static void cargarAgricultoresDesdeArchivo(Lista agricultores) {
-        try (ObjectInputStream in = new ObjectInputStream(new FileInputStream("agricultores.bin"))) {
-            
-            agricultores.vaciarLista();
+    public static <T> void cargarDesdeArchivo(Lista<T> lista, String nombreArchivo, Class<T> claseEsperada) {
+        try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(nombreArchivo))) {
 
-            // Intentamos leer objetos uno por uno hasta que no haya más
+            // Vaciar la lista antes de cargar los datos
+            lista.vaciarLista();
+
+            // Leer objetos del archivo uno por uno
             while (true) {
                 try {
-                    Agricultor agricultor = (Agricultor) in.readObject();
-                    agricultores.add(agricultor); 
+                    Object objeto = in.readObject(); // Leer objeto genérico
+                    if (claseEsperada.isInstance(objeto)) {
+                        // Comprobar si el objeto es de la clase esperada
+                        lista.add((T) objeto); // Agregar a la lista después del cast
+                    } else {
+                        System.out.println("Objeto no coincide con el tipo esperado: " + objeto.getClass().getName());
+                    }
                 } catch (EOFException e) {
                     // Fin del archivo alcanzado
                     break;
                 } catch (ClassNotFoundException e) {
-                    System.out.println("Error al deserializar un agricultor: " + e.getMessage());
+                    System.out.println("Error al deserializar un objeto: " + e.getMessage());
                 }
             }
 
-            System.out.println("Datos de agricultores cargados correctamente.");
+            System.out.println("Datos cargados correctamente desde " + nombreArchivo + ".");
         } catch (FileNotFoundException e) {
-            System.out.println("Archivo de agricultores no encontrado. Se iniciará con una lista vacía.");
+            System.out.println("Archivo no encontrado. Se iniciará con una lista vacía.");
         } catch (IOException e) {
-            System.out.println("Error al cargar los datos de agricultores: " + e.getMessage());
+            System.out.println("Error al cargar datos desde : " + nombreArchivo + " " + e.getMessage());
         }
     }
-
-    /**
-     * Guarda la lista de máquinas en un archivo binario llamado "maquinas.bin".
-     * Los objetos máquinas se guardan individualmente.
-     *
-     * @param maquinas La lista de máquinas a guardar en el archivo binario.
-     */
-    public static void guardarMaquinasEnArchivo(Lista maquinas) {
-        try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream("maquinas.bin"))) {
-            
-            Iterador<Maquina> iterador = new Iterador<>(maquinas);
-            while (iterador.hayElemento()) {
-                Maquina maquina = iterador.dameValor();
-                out.writeObject(maquina); // Escribe cada máquina individualmente
-                iterador.next();
-            }
-            System.out.println("Datos de máquinas guardados correctamente.");
-        } catch (IOException e) {
-            System.out.println("Error al guardar los datos de máquinas: " + e.getMessage());
-        }
-    }
-
-    /**
-     * Carga las máquinas almacenadas en un archivo binario llamado
-     * "maquinas.bin" y las agrega a la lista proporcionada. Los datos previos
-     * en la lista son eliminados.
-     *
-     * @param maquinas La lista donde se agregarán las máquinas cargadas desde
-     * el archivo binario.
-     */
-    @SuppressWarnings("unchecked") // Para evitar advertencias sobre cast
-    public static void cargarMaquinasDesdeArchivo(Lista maquinas) {
-        try (ObjectInputStream in = new ObjectInputStream(new FileInputStream("maquinas.bin"))) {
-            
-            maquinas.vaciarLista();
-
-            // Intentamos leer objetos uno por uno hasta que no haya más
-            while (true) {
-                try {
-                    Maquina maquina = (Maquina) in.readObject();
-                    maquinas.add(maquina); 
-                } catch (EOFException e) {
-                    // Fin del archivo alcanzado
-                    break;
-                } catch (ClassNotFoundException e) {
-                    System.out.println("Error al deserializar una máquina: " + e.getMessage());
-                }
-            }
-
-            System.out.println("Datos de máquinas cargados correctamente.");
-        } catch (FileNotFoundException e) {
-            System.out.println("Archivo de máquinas no encontrado. Se iniciará con una lista vacía.");
-        } catch (IOException e) {
-            System.out.println("Error al cargar los datos de máquinas: " + e.getMessage());
-        }
-    }
-
-    /**
-     * Guarda la lista de parcelas en un archivo binario llamado "parcelas.bin".
-     * Los objetos parcelas se guardan individualmente.
-     *
-     * @param parcelas La lista de parcelas a guardar en el archivo binario.
-     */
-    public static void guardarParcelasEnArchivo(Lista parcelas) {
-        try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream("parcelas.bin"))) {
-            
-            Iterador<Parcela> iterador = new Iterador<>(parcelas);
-            while (iterador.hayElemento()) {
-                Parcela parcela = iterador.dameValor();
-                out.writeObject(parcela); // Escribe cada parcela individualmente
-                iterador.next();
-            }
-            System.out.println("Datos de parcelas guardados correctamente.");
-        } catch (IOException e) {
-            System.out.println("Error al guardar los datos de parcelas: " + e.getMessage());
-        }
-    }
-
-    /**
-     * Carga las parcelas almacenadas en un archivo binario llamado
-     * "parcelas.bin" y las agrega a la lista proporcionada. Los datos previos
-     * en la lista son eliminados.
-     *
-     * @param parcelas La lista donde se agregarán las parcelas cargadas desde
-     * el archivo binario.
-     */
-    @SuppressWarnings("unchecked") // Para evitar advertencias sobre cast
-    public static void cargarParcelasDesdeArchivo(Lista parcelas) {
-        try (ObjectInputStream in = new ObjectInputStream(new FileInputStream("parcelas.bin"))) {
-            
-            parcelas.vaciarLista();
-
-            // Intentamos leer objetos uno por uno hasta que no haya más
-            while (true) {
-                try {
-                    Parcela parcela = (Parcela) in.readObject();
-                    parcelas.add(parcela); 
-                } catch (EOFException e) {
-                    // Fin del archivo alcanzado
-                    break;
-                } catch (ClassNotFoundException e) {
-                    System.out.println("Error al deserializar una parcela: " + e.getMessage());
-                }
-            }
-
-            System.out.println("Datos de parcelas cargados correctamente.");
-        } catch (FileNotFoundException e) {
-            System.out.println("Archivo de parcelas no encontrado. Se iniciará con una lista vacía.");
-        } catch (IOException e) {
-            System.out.println("Error al cargar los datos de parcelas: " + e.getMessage());
-        }
-    }
-
-    /**
-     * Guarda la lista de trabajos en un archivo binario llamado "trabajos.bin".
-     * Los objetos trabajos se guardan individualmente.
-     *
-     * @param trabajos La lista de trabajos a guardar en el archivo binario.
-     */
-    public static void guardarTrabajosEnArchivo(Lista trabajos) {
-        try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream("trabajos.bin"))) {
-            
-            Iterador<Trabajo> iterador = new Iterador<>(trabajos);
-            while (iterador.hayElemento()) {
-                Trabajo trabajo = iterador.dameValor();
-                out.writeObject(trabajo); // Escribe cada trabajo individualmente
-                iterador.next();
-            }
-            System.out.println("Datos de trabajos guardados correctamente.");
-        } catch (IOException e) {
-            System.out.println("Error al guardar los datos de trabajos: " + e.getMessage());
-        }
-    }
-
-    /**
-     * Carga los trabajos almacenados en un archivo binario llamado
-     * "trabajos.bin" y los agrega a la lista proporcionada. Los datos previos
-     * en la lista son eliminados.
-     *
-     * @param trabajos La lista donde se agregarán los trabajos cargados desde
-     * el archivo binario.
-     */
-    @SuppressWarnings("unchecked") // Para evitar advertencias sobre cast
-    public static void cargarTrabajosDesdeArchivo(Lista trabajos) {
-        try (ObjectInputStream in = new ObjectInputStream(new FileInputStream("trabajos.bin"))) {
-            
-            trabajos.vaciarLista();
-
-            // Intentamos leer objetos uno por uno hasta que no haya más
-            while (true) {
-                try {
-                    Trabajo trabajo = (Trabajo) in.readObject();
-                    trabajos.add(trabajo); // Agregar trabajo a la lista
-                } catch (EOFException e) {
-                    // Fin del archivo alcanzado
-                    break;
-                } catch (ClassNotFoundException e) {
-                    System.out.println("Error al deserializar un trabajo: " + e.getMessage());
-                }
-            }
-
-            System.out.println("Datos de trabajos cargados correctamente.");
-        } catch (FileNotFoundException e) {
-            System.out.println("Archivo de trabajos no encontrado. Se iniciará con una lista vacía.");
-        } catch (IOException e) {
-            System.out.println("Error al cargar los datos de trabajos: " + e.getMessage());
-        }
-    }
-
 }
